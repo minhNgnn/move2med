@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { handle, HttpError, requireUser, audit, sendSms } from "@/lib/api";
+import { closePendingRequests } from "@/lib/requests";
 
 /** Cancel one date of a series (or a single ride) that has not started. */
 export const POST = handle(async (_req, ctx) => {
@@ -10,6 +11,7 @@ export const POST = handle(async (_req, ctx) => {
   if (!ride) throw new HttpError(404, "Ride not found");
   if (!["planned", "assigned"].includes(ride.status)) throw new HttpError(409, "Only rides that have not started can be cancelled", "started");
   await db.update(schema.rides).set({ status: "cancelled" }).where(eq(schema.rides.id, id));
+  await closePendingRequests({ rideIds: [id] }, "ride_cancelled");
   await sendSms(
     ride.prescriptionId,
     `move2med: Your ${ride.leg === "hin" ? "outbound" : "return"} ride on ${ride.scheduledDate} at ${ride.pickupTime} was cancelled by the transport company.`,

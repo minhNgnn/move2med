@@ -18,6 +18,11 @@ dispatcher window (Berlin Taxi Zentrale) is the "wrong vehicle" moment.
 8. **Audit log** shows every key redemption, including the failed ones.
 9. **Patient status page** (`/status`, key + date of birth): large print timeline and the SMS inbox. Revoke / choose another company.
 
+Voice assistant (optional, ~1 min): on the patient page of **#20** (series, rides on future days) ask “When is my next ride?”, then
+“I can’t make my ride home on <a day in 2 days>”. It reads back, you say yes, and the dispatcher (Spree → Rides) sees “Patient asks to cancel”
+and confirms. Say “cancel everything” to show it refuses and points to the button. Today’s rides are too close to pickup to cancel by voice.
+Quick buttons work with no microphone. Say honestly: the browser may send audio to its maker; the model never sees ride data.
+
 Side cases (each seeded):
 - **#13 Arbeitsunfall**: billing is blocked, co-payment 10 € billed but accident cases are free. Fix is an explicit, audited action.
 - **#10 Hospiz Vertreter**: proof waits ("awaiting"); the relative confirms on the status page → verified.

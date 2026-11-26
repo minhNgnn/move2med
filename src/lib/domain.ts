@@ -2,6 +2,8 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { Addr } from "@/db/schema";
 import { sendSms } from "./api";
+import { closePendingRequests } from "./requests";
+import { berlinToday } from "./time";
 import { approvalFor, checkPrescription, expectedCopay, type ReasonCode } from "./rules";
 import { keyCodeFor, keyHash, pinFor, sha256hex, signCompact, uid, verifyCompact, verifyDeviceSig } from "./server-crypto";
 import { createHmac } from "node:crypto";
@@ -12,7 +14,7 @@ type Rx = typeof schema.prescriptions.$inferSelect;
 type Patient = typeof schema.patients.$inferSelect;
 type Ride = typeof schema.rides.$inferSelect;
 
-export const todayStr = () => new Date().toISOString().slice(0, 10);
+export const todayStr = () => berlinToday();
 export const addDays = (d: string, n: number) => new Date(Date.parse(d) + n * 86400000).toISOString().slice(0, 10);
 const hm = (min: number) => `${String(Math.floor(min / 60) % 24).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -300,6 +302,7 @@ export async function ingestEvents(device: typeof schema.devices.$inferSelect, e
       if (e.type === "pickup" && ["planned", "assigned"].includes(ride.status)) {
         await db.update(schema.rides).set({ status: "picked_up", pickedUpAt: at }).where(eq(schema.rides.id, ride.id));
         await notifyRide(ride, "pickup");
+        await closePendingRequests({ rideIds: [ride.id] }, "ride_started");
       } else if (e.type === "dropoff" && ride.status !== "completed") {
         await db.update(schema.rides).set({ status: "completed", completedAt: at }).where(eq(schema.rides.id, ride.id));
         await notifyRide(ride, "dropoff");

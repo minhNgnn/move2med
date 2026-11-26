@@ -10,6 +10,7 @@ export const GET = handle(async () => {
   const rides = await db.select().from(schema.rides).where(eq(schema.rides.prescriptionId, rx.id));
   const proofs = rides.length ? await db.select().from(schema.proofs).where(inArray(schema.proofs.rideId, rides.map((r) => r.id))) : [];
   const confirms = rides.length ? await db.select().from(schema.patientConfirmations).where(inArray(schema.patientConfirmations.rideId, rides.map((r) => r.id))) : [];
+  const reqs = rides.length ? await db.select().from(schema.cancellationRequests).where(inArray(schema.cancellationRequests.rideId, rides.map((r) => r.id))) : [];
   const [company] = rx.boundCompanyId ? await db.select().from(schema.companies).where(eq(schema.companies.id, rx.boundCompanyId)) : [];
   const vehicles = await db.select().from(schema.vehicles);
   const messages = await db.select().from(schema.sms).where(eq(schema.sms.prescriptionId, rx.id)).orderBy(desc(schema.sms.id)).limit(30);
@@ -19,7 +20,7 @@ export const GET = handle(async () => {
     workflow: workflowStatus(rx, rides),
     approval: approvalStatus(rx),
     keyStatus: rx.keyStatus,
-    company: company ? { name: company.name } : null,
+    company: company ? { name: company.name, phone: company.phone } : null,
     trip: { scenario: rx.data.szenario, facility: rx.data.behandlung.zieladresse, appointment: rx.data.behandlung.termin_uhrzeit, frequency: rx.data.behandlung.haeufigkeit, hin: rx.data.hinfahrt, rueck: rx.data.rueckfahrt },
     rides: rides
       .map((r) => ({
@@ -27,6 +28,7 @@ export const GET = handle(async () => {
         vehicle: vehicles.find((v) => v.id === r.vehicleId)?.label ?? null,
         proof: proofs.find((x) => x.rideId === r.id)?.status ?? null,
         proofMethod: proofs.find((x) => x.rideId === r.id)?.method ?? null,
+        cancelRequested: reqs.some((q) => q.rideId === r.id && q.state === "pending"),
         confirmedByRelative: confirms.some((c) => c.rideId === r.id),
       }))
       .sort((a, b) => (a.date + a.pickupTime).localeCompare(b.date + b.pickupTime)),

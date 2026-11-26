@@ -19,11 +19,11 @@ const PENDING_APPROVAL = new Set([1, 4, 12]);
 const NO_JUSTIFICATION = new Set([19]);
 
 const companies = [
-  { id: "c_spree", name: "Spree Krankentransport", ik: "440100001", city: "Berlin" },
-  { id: "c_berlintaxi", name: "Berlin Taxi Zentrale", ik: "440100002", city: "Berlin" },
-  { id: "c_elbe", name: "Elbe Patiententransport", ik: "440200001", city: "Hamburg" },
-  { id: "c_isar", name: "Isar Krankenfahrten", ik: "440300001", city: "München" },
-  { id: "c_rhein", name: "Rhein Mobil Köln", ik: "440400001", city: "Köln" },
+  { id: "c_spree", name: "Spree Krankentransport", ik: "440100001", city: "Berlin", phone: "+49 30 5550 1001" },
+  { id: "c_berlintaxi", name: "Berlin Taxi Zentrale", ik: "440100002", city: "Berlin", phone: "+49 30 5550 1002" },
+  { id: "c_elbe", name: "Elbe Patiententransport", ik: "440200001", city: "Hamburg", phone: "+49 40 5550 2001" },
+  { id: "c_isar", name: "Isar Krankenfahrten", ik: "440300001", city: "München", phone: "+49 89 5550 3001" },
+  { id: "c_rhein", name: "Rhein Mobil Köln", ik: "440400001", city: "Köln", phone: "+49 221 5550 4001" },
 ];
 
 const FULL = ["rollstuhl", "tragestuhl", "liegend"];
@@ -56,7 +56,7 @@ const users = [
 ];
 
 export async function seedAll() {
-  await db.execute(sql`truncate table companies, vehicles, users, devices, patients, prescriptions, rides, ride_events, proofs, patient_confirmations, audit_log, sms, billing_submissions restart identity`);
+  await db.execute(sql`truncate table companies, vehicles, users, devices, patients, prescriptions, rides, ride_events, proofs, patient_confirmations, audit_log, sms, billing_submissions, cancellation_requests restart identity`);
   await db.insert(schema.companies).values(companies);
   await db.insert(schema.vehicles).values(vehicles);
   const passwordHash = hashPassword(DEMO_PASSWORD);

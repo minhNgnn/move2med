@@ -39,11 +39,17 @@ All demo accounts use the password `demo`. `/demo` lists every ride key and has 
 
 Language: English by default, one click to German (top right).
 
+Settings (`.env.local`, or `.env`): `DATABASE_URL`, `DEMO_MODE`, `DEMO_ADMIN_PIN` (public deployments), and for the voice assistant
+`OPENROUTER_API_KEY` (server-side only; optionally `ASSISTANT_MODEL_ID`, default `anthropic/claude-haiku-5.5`). Without a key
+the assistant says so and the quick buttons keep working; `ASSISTANT_MODEL=fake` switches in a deterministic fake for tests.
+
 ## Tests
 
 ```bash
 node scripts/smoke.mjs            # hero flow: issue → approve → redeem → accept → assign → sign → bill → verify
 node scripts/smoke-cases.mjs      # #13 co-payment, #10 proxy, #18 heavy-duty, key revoke/reassign, suspend
+node scripts/smoke-assistant.mjs   # voice assistant (needs a server with ASSISTANT_MODEL=fake on :3102 and one with OPENROUTER_API_KEY="" on :3103)
+node scripts/e2e-assistant.mjs <dir>   # real Chromium: voice panel, read-back, dispatcher confirms (server with ASSISTANT_MODEL=fake)
 node scripts/e2e-driver.mjs       # real Chromium: offline ride, reload offline, encrypted storage, sync, remote wipe
 node scripts/e2e-driver-claims.mjs <dir>  # real Chromium: tampered phone clock is caught, stale unsynced evidence warns
 ```
@@ -63,6 +69,12 @@ The first two need a running server (they log in a lot: wait a minute between ru
   (incl. accident / BVG), approval pending, different vehicles outbound/return, fleet mismatch, unverified proof.
 - **Three-layer proof** per ride: (1) mock PoPP token for the patient, (2) ECDSA P-256 signature from the driver's device
   (private key non-extractable), (3) gateway countersignature. The insurer re-verifies all three.
+- **Voice assistant** (optional, in the patient's status page): ask about rides by voice or text, and request the cancellation of
+  one ride. A small language model (OpenRouter, `OPENROUTER_API_KEY`) only labels the sentence (status / cancel / not
+  supported + day + leg); it never sees ride data and never writes the reply, which is built from fixed German and English
+  templates ([ADR 0001](docs/adr/0001-voice-assistant-model-only-classifies.md)). A cancellation is only a *request*: the
+  assistant reads back what it understood, waits for a yes, refuses within 2 hours of pickup, and a dispatcher confirms or
+  declines. Typed input and three quick buttons work with no voice, no model and no key. Vocabulary: [GLOSSARY.md](GLOSSARY.md).
 - **Onboarding**: an insurer registers a company (IK + first dispatcher); the dispatcher adds vehicles (type, equipment) and drivers.
 - **Offline driver app**: PWA + service worker, ride data AES-GCM encrypted in IndexedDB, append-only signed event log
   with device-generated IDs (idempotent), server-anchored trusted time checked against GPS, evidence never discarded
@@ -73,6 +85,7 @@ The first two need a running server (they log in a lot: wait a minute between ru
 - The health-card tap is **detected, not read** (Android Chrome: Web NFC `readingerror`; elsewhere a demo button). Reading
   the card needs gematik's native PoPP client. The patient proof is a signed **mock** PoPP token.
 - Phone clock tampering is detected within a session (monotonic clock) but only flagged after an app restart.
+- Browser speech recognition may send audio to the browser maker; the app stores no audio and no spoken sentences.
 - Rate limiting is in-memory per server instance. Background Sync works on Android Chrome only; iOS syncs on reopen,
   reconnect and a 20 s timer.
 - No real SMS (an in-app inbox simulates it), no real billing transfer (a downloadable JSON stands in for § 302 / TP5).

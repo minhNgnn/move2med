@@ -31,6 +31,7 @@ export function DispatchApp() {
   const jobs = usePoll<{ rides: any[] }>("/api/dispatch/jobs", 2500);
   const toAssign = jobs.data?.rides.filter((r) => r.status === "planned").length ?? 0;
   const live = jobs.data?.rides.filter((r) => r.status === "picked_up").length ?? 0;
+  const asks = jobs.data?.rides.filter((r) => r.cancelRequest).length ?? 0;
   return (
     <div className="space-y-5">
       <Tabs
@@ -38,7 +39,7 @@ export function DispatchApp() {
         onChange={setTab}
         tabs={[
           { id: "redeem", label: L("Redeem ride key", "Fahrtschlüssel einlösen") },
-          { id: "jobs", label: L("Rides", "Fahrten"), badge: toAssign ? `${toAssign} ${L("to assign", "zuzuweisen")}` : live ? `${live} ${L("live", "läuft")}` : null },
+          { id: "jobs", label: L("Rides", "Fahrten"), badge: asks ? `${asks} ${L("cancellation request(s)", "Absage-Anfrage(n)")}` : toAssign ? `${toAssign} ${L("to assign", "zuzuweisen")}` : live ? `${live} ${L("live", "läuft")}` : null },
           { id: "fleet", label: L("Fleet & devices", "Flotte & Geräte") },
           { id: "billing", label: L("Billing", "Abrechnung") },
         ]}
@@ -354,6 +355,15 @@ function JobsTab({ rides, reload }: { rides: any[]; reload: () => void }) {
                 <Td>
                   <Badge tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</Badge>
                   {r.flags.filter((f: Flag) => f.code === "series_unconfirmed").map((f: Flag, i: number) => <span key={i} className="mt-1 block text-xs text-warn">⚠ {L("not confirmed", "nicht bestätigt")}</span>)}
+                  {r.cancelRequest && (
+                    <div className="mt-1.5 rounded-lg bg-warn-soft p-2" data-testid="cancel-request">
+                      <p className="text-xs font-semibold text-warn">{L("Patient asks to cancel", "Patient bittet um Absage")}</p>
+                      <div className="mt-1 flex gap-1.5">
+                        <Button size="sm" variant="good" onClick={async () => { try { await api(`/api/dispatch/cancel-requests/${r.cancelRequest.id}`, { body: { decision: "confirm" } }); reload(); } catch (e) { setErr((e as Error).message); } }}>{L("Confirm", "Bestätigen")}</Button>
+                        <Button size="sm" variant="secondary" onClick={async () => { try { await api(`/api/dispatch/cancel-requests/${r.cancelRequest.id}`, { body: { decision: "decline" } }); reload(); } catch (e) { setErr((e as Error).message); } }}>{L("Decline", "Ablehnen")}</Button>
+                      </div>
+                    </div>
+                  )}
                   {["planned", "assigned"].includes(r.status) && (
                     <button className="mt-1 block text-xs text-bad underline" onClick={async () => { if (confirm(L("Cancel this ride? The patient is told by SMS.", "Diese Fahrt stornieren? Der Patient wird per SMS informiert."))) { try { await api(`/api/dispatch/rides/${r.id}/cancel`, { body: {} }); reload(); } catch (e) { setErr((e as Error).message); } } }}>{L("Cancel this date", "Diesen Termin stornieren")}</button>
                   )}

@@ -3,11 +3,13 @@ import { db, schema } from "@/db";
 import { handle, requirePatient, audit, sendSms } from "@/lib/api";
 import { loadForPatient } from "@/lib/patient";
 import { rotateKey } from "@/lib/domain";
+import { closePendingRequests } from "@/lib/requests";
 
 /** Hand the trip to a different company: unbind, cancel unstarted rides, and issue a NEW key so the old company's key stops working. */
 export const POST = handle(async () => {
   const ps = await requirePatient();
   const { rx } = await loadForPatient(ps.rx);
+  await closePendingRequests({ prescriptionId: rx.id }, "trip_reassigned");
   await db
     .update(schema.rides)
     .set({ status: "cancelled" })

@@ -14,6 +14,7 @@ export const GET = handle(async () => {
     .where(eq(schema.rides.companyId, s.companyId ?? "none"));
   const vehicles = await db.select().from(schema.vehicles).where(eq(schema.vehicles.companyId, s.companyId ?? "none"));
   const users = await db.select().from(schema.users).where(eq(schema.users.companyId, s.companyId ?? "none"));
+  const requests = rows.length ? await db.select().from(schema.cancellationRequests).where(inArray(schema.cancellationRequests.rideId, rows.map((r) => r.ride.id))) : [];
   const proofs = rows.length ? await db.select().from(schema.proofs).where(inArray(schema.proofs.rideId, rows.map((r) => r.ride.id))) : [];
   const rxFlags = new Map<string, ReturnType<typeof checkPrescription>>();
   for (const { rx, p } of rows) {
@@ -33,6 +34,7 @@ export const GET = handle(async () => {
           scenario: rx.data.szenario, patient: p.name, weightKg: rx.data.sonstiges.gewicht_kg ?? null, series: !!rx.data.behandlung.haeufigkeit,
           vehicleLabel: vehicles.find((v) => v.id === ride.vehicleId)?.label ?? null,
           driverName: users.find((u) => u.id === ride.driverId)?.name ?? null,
+          cancelRequest: requests.find((q) => q.rideId === ride.id && q.state === "pending") ? { id: requests.find((q) => q.rideId === ride.id && q.state === "pending")!.id, createdAt: requests.find((q) => q.rideId === ride.id && q.state === "pending")!.createdAt } : null,
           proof: proof ? { status: proof.status, method: proof.method, flags: proof.flags, tapTime: proof.tapTime } : null,
           flags: [
             ...(rxFlags.get(rx.id) ?? []),

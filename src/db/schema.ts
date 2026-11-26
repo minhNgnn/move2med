@@ -24,6 +24,7 @@ export const companies = pgTable("companies", {
   ik: text("ik").notNull(),
   city: text("city").notNull(),
   status: text("status").notNull().default("registered"), // registered | suspended
+  phone: text("phone"),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
@@ -209,3 +210,19 @@ export const billingSubmissions = pgTable("billing_submissions", {
   status: text("status").notNull().default("submitted"), // submitted | verified | rejected
   verifiedAt: ts("verified_at"),
 });
+
+/** A patient's ask (e.g. by voice) to cancel one ride, pending until a dispatcher decides. */
+export const cancellationRequests = pgTable(
+  "cancellation_requests",
+  {
+    id: text("id").primaryKey(),
+    rideId: text("ride_id").notNull(),
+    prescriptionId: text("prescription_id").notNull(),
+    state: text("state").notNull().default("pending"), // pending | confirmed | declined | closed
+    createdAt: ts("created_at").notNull().defaultNow(),
+    decidedAt: ts("decided_at"),
+    decidedBy: text("decided_by"),
+    closedReason: text("closed_reason"),
+  },
+  (t) => [index("cancel_req_ride_idx").on(t.rideId)],
+);

@@ -6,12 +6,13 @@ import { useState } from "react";
 import { api, ApiError, fmtDate, fmtTime, usePoll } from "@/lib/hooks";
 import { useLang } from "@/lib/lang";
 import { LangToggle } from "./Shell";
+import { VoicePanel } from "./VoicePanel";
 import { Badge, Button, Card, CodeChip, ErrorBox, Field, Input, Logo } from "./ui";
 
 type Status = {
-  patient: { name: string; insurer: string }; status: string; workflow?: string; approval: string; keyStatus: string; company: { name: string } | null;
+  patient: { name: string; insurer: string }; status: string; workflow?: string; approval: string; keyStatus: string; company: { name: string; phone: string | null } | null;
   trip: { scenario: string; facility: { einrichtung: string; strasse: string; plz: string; ort: string }; appointment: string; frequency: string | null };
-  rides: { id: string; leg: string; date: string; pickupTime: string; status: string; pickedUpAt: string | null; completedAt: string | null; vehicle: string | null; proof: string | null; proofMethod: string | null; confirmedByRelative: boolean }[];
+  rides: { id: string; leg: string; date: string; pickupTime: string; status: string; pickedUpAt: string | null; completedAt: string | null; vehicle: string | null; proof: string | null; proofMethod: string | null; confirmedByRelative: boolean; cancelRequested?: boolean }[];
   messages: { id: number; at: string; en: string; de: string }[];
 };
 
@@ -115,7 +116,7 @@ function Dashboard({ d, reload }: { d: Status; reload: () => void }) {
             </Step>
           )}
           <Step state={d.company ? "done" : revoked || d.approval === "rejected" || d.approval === "pending" ? "todo" : "now"} title={d.company ? `${d.company.name}` : L("Give your ride key to a transport company", "Geben Sie Ihren Fahrtschlüssel an ein Transportunternehmen")}>
-            {d.company ? L("accepted your trip", "hat Ihre Fahrt angenommen") : L("Call a company and read out your key, or show your letter.", "Rufen Sie ein Unternehmen an und lesen Sie den Schlüssel vor, oder zeigen Sie den Brief.")}
+            {d.company ? <>{L("accepted your trip", "hat Ihre Fahrt angenommen")}{d.company.phone && <> · <a href={`tel:${d.company.phone.replace(/\s/g, "")}`} className="underline">{d.company.phone}</a></>}</> : L("Call a company and read out your key, or show your letter.", "Rufen Sie ein Unternehmen an und lesen Sie den Schlüssel vor, oder zeigen Sie den Brief.")}
           </Step>
           <Step state={d.rides.length && doneCount === d.rides.length ? "done" : doneCount > 0 || d.rides.some((r) => r.status === "picked_up") ? "now" : "todo"} title={d.rides.length ? L(`Rides (${doneCount} of ${d.rides.length} done)`, `Fahrten (${doneCount} von ${d.rides.length} erledigt)`) : L("Rides", "Fahrten")}>
             {!d.rides.length && L("They appear here once a company accepts.", "Sie erscheinen hier, sobald ein Unternehmen annimmt.")}
@@ -130,6 +131,7 @@ function Dashboard({ d, reload }: { d: Status; reload: () => void }) {
                   <div>
                     <p className="text-xl font-semibold text-ink"><Truck className="mr-2 inline h-5 w-5 text-cyan" />{r.leg === "hin" ? L("To the clinic", "Zur Klinik") : L("Back home", "Zurück nach Hause")} · {r.pickupTime}</p>
                     <p className="text-sm text-muted">{r.vehicle ?? L("vehicle not assigned yet", "Fahrzeug noch nicht zugewiesen")} · {r.status === "completed" ? <>{L("arrived", "angekommen")} {fmtTime(r.completedAt, lang)}</> : r.status === "picked_up" ? <>{L("picked up", "abgeholt")} {fmtTime(r.pickedUpAt, lang)}</> : L("planned", "geplant")}</p>
+                    {r.cancelRequested && <Badge tone="warn" className="mt-1">{L("cancellation requested: waiting for the company", "Absage angefragt: wartet auf das Unternehmen")}</Badge>}
                     {r.proof === "verified" && <Badge tone="good" className="mt-1"><CheckCircle2 className="h-3 w-3" /> {L("confirmed", "bestätigt")}</Badge>}
                     {r.proof === "awaiting" && <Badge tone="info" className="mt-1">{L("waiting for your confirmation", "wartet auf Ihre Bestätigung")}</Badge>}
                   </div>
@@ -142,6 +144,8 @@ function Dashboard({ d, reload }: { d: Status; reload: () => void }) {
           </div>
         ))}
       </Card>
+
+      {!revoked && <VoicePanel />}
 
       <Card title={<span className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-cyan" /> {L("Your messages (simulated SMS)", "Ihre Nachrichten (simulierte SMS)")}</span>}>
         <div className="space-y-2">

@@ -1,0 +1,19 @@
+# dependencies / build
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# env
+.env
+.env*.local
+
+# OS
+.DS_Store
+
+# copyrighted / personal material (not for the public repo)
+docs/source/
+docs/images/challenge_slides/
+docs/images/impulspapier_soll_prozess.png

@@ -1,0 +1,1593 @@
+{
+  "_disclaimer": "Vollständig synthetischer Hackathon-Testdatensatz",
+  "testdaten": [
+    {
+      "patient_id": 1,
+      "display_name": "Testperson 1",
+      "birthdate": "1971-05-02",
+      "versichertennummer": "X000000001",
+      "anschrift": {
+        "strasse": "Musterweg 1",
+        "plz": "10001",
+        "ort": "Hamburg"
+      },
+      "krankenkasse": {
+        "name": "TK Test",
+        "ikNummer": "100000001"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Dialyse",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Dialyse"
+        },
+        "behandlung": {
+          "bezeichnung": "Dialyse",
+          "von": "2026-11-01",
+          "haeufigkeit": "3x pro Woche",
+          "bis_voraussichtlich": "2027-01-31",
+          "termin_uhrzeit": "08:00",
+          "abholzeit_geplant": "07:15",
+          "zieladresse": {
+            "einrichtung": "Dialysezentrum Nord",
+            "strasse": "Dialyseweg 10",
+            "plz": "20095",
+            "ort": "Hamburg"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000001",
+          "belegnummer": "B00001",
+          "rechnungsnummer": "R00001",
+          "gesamt_brutto": 96,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 13
+        }
+      }
+    },
+    {
+      "patient_id": 2,
+      "display_name": "Testperson 2",
+      "birthdate": "1972-05-03",
+      "versichertennummer": "X000000002",
+      "anschrift": {
+        "strasse": "Musterweg 2",
+        "plz": "10002",
+        "ort": "München"
+      },
+      "krankenkasse": {
+        "name": "Barmer Test",
+        "ikNummer": "100000002"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Dialyse Gemeinschaftsfahrt",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Dialyse Gemeinschaftsfahrt"
+        },
+        "behandlung": {
+          "bezeichnung": "Dialyse Gemeinschaftsfahrt",
+          "von": "2026-11-01",
+          "haeufigkeit": "3x pro Woche",
+          "bis_voraussichtlich": "2027-01-31",
+          "termin_uhrzeit": "07:30",
+          "abholzeit_geplant": "06:45",
+          "zieladresse": {
+            "einrichtung": "Nierenzentrum München Mitte",
+            "strasse": "Isarring 25",
+            "plz": "80331",
+            "ort": "München"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {
+          "gemeinschaftsfahrt": true
+        },
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000002",
+          "belegnummer": "B00002",
+          "rechnungsnummer": "R00002",
+          "gesamt_brutto": 97,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 14
+        }
+      }
+    },
+    {
+      "patient_id": 3,
+      "display_name": "Testperson 3",
+      "birthdate": "1973-05-04",
+      "versichertennummer": "X000000003",
+      "anschrift": {
+        "strasse": "Musterweg 3",
+        "plz": "10003",
+        "ort": "Köln"
+      },
+      "krankenkasse": {
+        "name": "DAK Test",
+        "ikNummer": "100000003"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Chemotherapie",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Chemotherapie"
+        },
+        "behandlung": {
+          "bezeichnung": "Chemotherapie",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null,
+          "termin_uhrzeit": "09:00",
+          "abholzeit_geplant": "08:15",
+          "zieladresse": {
+            "einrichtung": "MVZ Onkologie Köln",
+            "strasse": "Tumorstraße 8",
+            "plz": "50667",
+            "ort": "Köln"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000003",
+          "belegnummer": "B00003",
+          "rechnungsnummer": "R00003",
+          "gesamt_brutto": 98,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 15
+        }
+      }
+    },
+    {
+      "patient_id": 4,
+      "display_name": "Testperson 4",
+      "birthdate": "1974-05-05",
+      "versichertennummer": "X000000004",
+      "anschrift": {
+        "strasse": "Musterweg 4",
+        "plz": "10004",
+        "ort": "Berlin"
+      },
+      "krankenkasse": {
+        "name": "AOK Test",
+        "ikNummer": "100000004"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": true,
+        "gueltig_bis": "2027-12-31"
+      },
+      "transportdaten": {
+        "szenario": "Strahlentherapie",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Strahlentherapie"
+        },
+        "behandlung": {
+          "bezeichnung": "Strahlentherapie",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null,
+          "termin_datum": "2026-11-15",
+          "termin_uhrzeit": "08:15",
+          "abholzeit_geplant": "07:30",
+          "zieladresse": {
+            "einrichtung": "Zentrum für Strahlentherapie Berlin",
+            "strasse": "Klinikallee 15",
+            "plz": "10115",
+            "ort": "Berlin"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000004",
+          "belegnummer": "B00004",
+          "rechnungsnummer": "R00004",
+          "gesamt_brutto": 99,
+          "zuzahlung": 0,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 16
+        }
+      }
+    },
+    {
+      "patient_id": 5,
+      "display_name": "Testperson 5",
+      "birthdate": "1975-05-06",
+      "versichertennummer": "X000000005",
+      "anschrift": {
+        "strasse": "Musterweg 5",
+        "plz": "10005",
+        "ort": "Hamburg"
+      },
+      "krankenkasse": {
+        "name": "TK Test",
+        "ikNummer": "100000005"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Krankenhausaufnahme",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Krankenhausaufnahme"
+        },
+        "behandlung": {
+          "bezeichnung": "Krankenhausaufnahme",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null,
+          "termin_uhrzeit": "10:00",
+          "abholzeit_geplant": "09:15",
+          "zieladresse": {
+            "einrichtung": "Universitätsklinikum Hamburg",
+            "strasse": "Klinikring 1",
+            "plz": "20246",
+            "ort": "Hamburg"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000005",
+          "belegnummer": "B00005",
+          "rechnungsnummer": "R00005",
+          "gesamt_brutto": 100,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 17
+        }
+      }
+    },
+    {
+      "patient_id": 6,
+      "display_name": "Testperson 6",
+      "birthdate": "1976-05-07",
+      "versichertennummer": "X000000006",
+      "anschrift": {
+        "strasse": "Musterweg 6",
+        "plz": "10006",
+        "ort": "München"
+      },
+      "krankenkasse": {
+        "name": "Barmer Test",
+        "ikNummer": "100000006"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Krankenhausentlassung",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Krankenhausentlassung"
+        },
+        "behandlung": {
+          "bezeichnung": "Krankenhausentlassung",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null,
+          "termin_uhrzeit": "14:00",
+          "abholzeit_geplant": "13:15",
+          "zieladresse": {
+            "einrichtung": "Klinikum München West",
+            "strasse": "Krankenhausstraße 7",
+            "plz": "80636",
+            "ort": "München"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000006",
+          "belegnummer": "B00006",
+          "rechnungsnummer": "R00006",
+          "gesamt_brutto": 101,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 18
+        }
+      }
+    },
+    {
+      "patient_id": 7,
+      "display_name": "Testperson 7",
+      "birthdate": "1977-05-08",
+      "versichertennummer": "X000000007",
+      "anschrift": {
+        "strasse": "Musterweg 7",
+        "plz": "10007",
+        "ort": "Köln"
+      },
+      "krankenkasse": {
+        "name": "DAK Test",
+        "ikNummer": "100000007"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Vorstationär",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Vorstationär"
+        },
+        "behandlung": {
+          "bezeichnung": "Vorstationär",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "11:00",
+          "abholzeit_geplant": "10:15",
+          "zieladresse": {
+            "einrichtung": "Herzzentrum Köln",
+            "strasse": "Kardioallee 11",
+            "plz": "50674",
+            "ort": "Köln"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000007",
+          "belegnummer": "B00007",
+          "rechnungsnummer": "R00007",
+          "gesamt_brutto": 102,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 19
+        }
+      }
+    },
+    {
+      "patient_id": 8,
+      "display_name": "Testperson 8",
+      "birthdate": "1978-05-09",
+      "versichertennummer": "X000000008",
+      "anschrift": {
+        "strasse": "Musterweg 8",
+        "plz": "10008",
+        "ort": "Berlin"
+      },
+      "krankenkasse": {
+        "name": "AOK Test",
+        "ikNummer": "100000008"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": true,
+        "gueltig_bis": "2027-12-31"
+      },
+      "transportdaten": {
+        "szenario": "Nachstationär",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Nachstationär"
+        },
+        "behandlung": {
+          "bezeichnung": "Nachstationär",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "13:30",
+          "abholzeit_geplant": "12:45",
+          "zieladresse": {
+            "einrichtung": "Städtisches Klinikum Berlin Mitte",
+            "strasse": "Gesundheitsplatz 4",
+            "plz": "10117",
+            "ort": "Berlin"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000008",
+          "belegnummer": "B00008",
+          "rechnungsnummer": "R00008",
+          "gesamt_brutto": 103,
+          "zuzahlung": 0,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 20
+        }
+      }
+    },
+    {
+      "patient_id": 9,
+      "display_name": "Testperson 9",
+      "birthdate": "1979-05-10",
+      "versichertennummer": "X000000009",
+      "anschrift": {
+        "strasse": "Musterweg 9",
+        "plz": "10009",
+        "ort": "Hamburg"
+      },
+      "krankenkasse": {
+        "name": "TK Test",
+        "ikNummer": "100000009"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Hospiz",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Hospiz"
+        },
+        "behandlung": {
+          "bezeichnung": "Hospiz",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "15:00",
+          "abholzeit_geplant": "14:15",
+          "zieladresse": {
+            "einrichtung": "Hospiz Elbblick",
+            "strasse": "Elbchaussee 55",
+            "plz": "22765",
+            "ort": "Hamburg"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000009",
+          "belegnummer": "B00009",
+          "rechnungsnummer": "R00009",
+          "gesamt_brutto": 104,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 21
+        }
+      }
+    },
+    {
+      "patient_id": 10,
+      "display_name": "Testperson 10",
+      "birthdate": "1980-05-11",
+      "versichertennummer": "X000000010",
+      "anschrift": {
+        "strasse": "Musterweg 10",
+        "plz": "10010",
+        "ort": "München"
+      },
+      "krankenkasse": {
+        "name": "Barmer Test",
+        "ikNummer": "100000010"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Hospiz Vertreter",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungsfreie Fahrt",
+          "grund": "Hospiz Vertreter"
+        },
+        "behandlung": {
+          "bezeichnung": "Hospiz Vertreter",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "15:30",
+          "abholzeit_geplant": "14:45",
+          "zieladresse": {
+            "einrichtung": "Hospiz München Süd",
+            "strasse": "Lindenweg 2",
+            "plz": "81541",
+            "ort": "München"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": true,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000010",
+          "belegnummer": "B00010",
+          "rechnungsnummer": "R00010",
+          "gesamt_brutto": 105,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 22
+        }
+      }
+    },
+    {
+      "patient_id": 11,
+      "display_name": "Testperson 11",
+      "birthdate": "1981-05-12",
+      "versichertennummer": "X000000011",
+      "anschrift": {
+        "strasse": "Musterweg 11",
+        "plz": "10011",
+        "ort": "Köln"
+      },
+      "krankenkasse": {
+        "name": "DAK Test",
+        "ikNummer": "100000011"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Mobilitätseinschränkung Taxi",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Mobilitätseinschränkung Taxi"
+        },
+        "behandlung": {
+          "bezeichnung": "Mobilitätseinschränkung Taxi",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "10:30",
+          "abholzeit_geplant": "10:00",
+          "zieladresse": {
+            "einrichtung": "Orthopädisches Zentrum Köln",
+            "strasse": "Bewegungsweg 18",
+            "plz": "50670",
+            "ort": "Köln"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000011",
+          "belegnummer": "B00011",
+          "rechnungsnummer": "R00011",
+          "gesamt_brutto": 106,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 23
+        }
+      }
+    },
+    {
+      "patient_id": 12,
+      "display_name": "Testperson 12",
+      "birthdate": "1982-05-13",
+      "versichertennummer": "X000000012",
+      "anschrift": {
+        "strasse": "Musterweg 12",
+        "plz": "10012",
+        "ort": "Berlin"
+      },
+      "krankenkasse": {
+        "name": "AOK Test",
+        "ikNummer": "100000012"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": true,
+        "gueltig_bis": "2027-12-31"
+      },
+      "transportdaten": {
+        "szenario": "Mobilitätseinschränkung KTW",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Mobilitätseinschränkung KTW"
+        },
+        "behandlung": {
+          "bezeichnung": "Mobilitätseinschränkung KTW",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_datum": "2026-11-15",
+          "termin_uhrzeit": "10:00",
+          "abholzeit_geplant": "09:00",
+          "zieladresse": {
+            "einrichtung": "Reha-Zentrum Berlin Ost",
+            "strasse": "Rehaweg 21",
+            "plz": "10365",
+            "ort": "Berlin"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000012",
+          "belegnummer": "B00012",
+          "rechnungsnummer": "R00012",
+          "gesamt_brutto": 107,
+          "zuzahlung": 0,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 24
+        }
+      }
+    },
+    {
+      "patient_id": 13,
+      "display_name": "Testperson 13",
+      "birthdate": "1983-05-14",
+      "versichertennummer": "X000000013",
+      "anschrift": {
+        "strasse": "Musterweg 13",
+        "plz": "10013",
+        "ort": "Hamburg"
+      },
+      "krankenkasse": {
+        "name": "TK Test",
+        "ikNummer": "100000013"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Arbeitsunfallfolge",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "Arbeitsunfall",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Arbeitsunfallfolge"
+        },
+        "behandlung": {
+          "bezeichnung": "Arbeitsunfallfolge",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "09:30",
+          "abholzeit_geplant": "08:30",
+          "zieladresse": {
+            "einrichtung": "BG Unfallklinik Hamburg",
+            "strasse": "Unfallweg 5",
+            "plz": "22081",
+            "ort": "Hamburg"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000013",
+          "belegnummer": "B00013",
+          "rechnungsnummer": "R00013",
+          "gesamt_brutto": 108,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 25
+        }
+      }
+    },
+    {
+      "patient_id": 14,
+      "display_name": "Testperson 14",
+      "birthdate": "1984-05-15",
+      "versichertennummer": "X000000014",
+      "anschrift": {
+        "strasse": "Musterweg 14",
+        "plz": "10014",
+        "ort": "München"
+      },
+      "krankenkasse": {
+        "name": "Barmer Test",
+        "ikNummer": "100000014"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Berufskrankheit",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "Berufskrankheit",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Berufskrankheit"
+        },
+        "behandlung": {
+          "bezeichnung": "Berufskrankheit",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "11:30",
+          "abholzeit_geplant": "10:30",
+          "zieladresse": {
+            "einrichtung": "Arbeitsmedizinisches Zentrum München",
+            "strasse": "Präventionsring 9",
+            "plz": "80335",
+            "ort": "München"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000014",
+          "belegnummer": "B00014",
+          "rechnungsnummer": "R00014",
+          "gesamt_brutto": 109,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 26
+        }
+      }
+    },
+    {
+      "patient_id": 15,
+      "display_name": "Testperson 15",
+      "birthdate": "1985-05-16",
+      "versichertennummer": "X000000015",
+      "anschrift": {
+        "strasse": "Musterweg 15",
+        "plz": "10015",
+        "ort": "Köln"
+      },
+      "krankenkasse": {
+        "name": "DAK Test",
+        "ikNummer": "100000015"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "BVG-Leiden",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "Versorgungsleiden (BVG)",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "BVG-Leiden"
+        },
+        "behandlung": {
+          "bezeichnung": "BVG-Leiden",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "12:00",
+          "abholzeit_geplant": "11:00",
+          "zieladresse": {
+            "einrichtung": "Versorgungsmedizinisches Zentrum Köln",
+            "strasse": "Versorgungsallee 3",
+            "plz": "50668",
+            "ort": "Köln"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000015",
+          "belegnummer": "B00015",
+          "rechnungsnummer": "R00015",
+          "gesamt_brutto": 110,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 27
+        }
+      }
+    },
+    {
+      "patient_id": 16,
+      "display_name": "Testperson 16",
+      "birthdate": "1986-05-17",
+      "versichertennummer": "X000000016",
+      "anschrift": {
+        "strasse": "Musterweg 16",
+        "plz": "10016",
+        "ort": "Berlin"
+      },
+      "krankenkasse": {
+        "name": "AOK Test",
+        "ikNummer": "100000016"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": true,
+        "gueltig_bis": "2027-12-31"
+      },
+      "transportdaten": {
+        "szenario": "Tragestuhltransport",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Tragestuhltransport"
+        },
+        "behandlung": {
+          "bezeichnung": "Tragestuhltransport",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "09:45",
+          "abholzeit_geplant": "08:45",
+          "zieladresse": {
+            "einrichtung": "Facharztzentrum Berlin Süd",
+            "strasse": "Gesundheitsstraße 14",
+            "plz": "12163",
+            "ort": "Berlin"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Tragestuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Tragestuhl"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000016",
+          "belegnummer": "B00016",
+          "rechnungsnummer": "R00016",
+          "gesamt_brutto": 111,
+          "zuzahlung": 0,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 28
+        }
+      }
+    },
+    {
+      "patient_id": 17,
+      "display_name": "Testperson 17",
+      "birthdate": "1987-05-18",
+      "versichertennummer": "X000000017",
+      "anschrift": {
+        "strasse": "Musterweg 17",
+        "plz": "10017",
+        "ort": "Hamburg"
+      },
+      "krankenkasse": {
+        "name": "TK Test",
+        "ikNummer": "100000017"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Liegendtransport",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Liegendtransport"
+        },
+        "behandlung": {
+          "bezeichnung": "Liegendtransport",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "08:45",
+          "abholzeit_geplant": "07:45",
+          "zieladresse": {
+            "einrichtung": "Schmerzzentrum Hamburg",
+            "strasse": "Therapiepark 7",
+            "plz": "20097",
+            "ort": "Hamburg"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "liegend"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "liegend"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000017",
+          "belegnummer": "B00017",
+          "rechnungsnummer": "R00017",
+          "gesamt_brutto": 112,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 29
+        }
+      }
+    },
+    {
+      "patient_id": 18,
+      "display_name": "Testperson 18",
+      "birthdate": "1988-05-19",
+      "versichertennummer": "X000000018",
+      "anschrift": {
+        "strasse": "Musterweg 18",
+        "plz": "10018",
+        "ort": "München"
+      },
+      "krankenkasse": {
+        "name": "Barmer Test",
+        "ikNummer": "100000018"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Schwergewichttransport",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Schwergewichttransport"
+        },
+        "behandlung": {
+          "bezeichnung": "Schwergewichttransport",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "07:45",
+          "abholzeit_geplant": "06:30",
+          "zieladresse": {
+            "einrichtung": "Adipositaszentrum München",
+            "strasse": "Gesundheitscampus 12",
+            "plz": "81675",
+            "ort": "München"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "liegend"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "liegend"
+        },
+        "sonstiges": {
+          "gewicht_kg": 210
+        },
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000018",
+          "belegnummer": "B00018",
+          "rechnungsnummer": "R00018",
+          "gesamt_brutto": 113,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 30
+        }
+      }
+    },
+    {
+      "patient_id": 19,
+      "display_name": "Testperson 19",
+      "birthdate": "1989-05-20",
+      "versichertennummer": "X000000019",
+      "anschrift": {
+        "strasse": "Musterweg 19",
+        "plz": "10019",
+        "ort": "Köln"
+      },
+      "krankenkasse": {
+        "name": "DAK Test",
+        "ikNummer": "100000019"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": false,
+        "gueltig_bis": null
+      },
+      "transportdaten": {
+        "szenario": "Unterschiedliche Hin/Rückfahrt",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Unterschiedliche Hin/Rückfahrt"
+        },
+        "behandlung": {
+          "bezeichnung": "Unterschiedliche Hin/Rückfahrt",
+          "von": "2026-11-01",
+          "haeufigkeit": null,
+          "bis_voraussichtlich": null, 
+          "termin_uhrzeit": "09:15",
+          "abholzeit_geplant": "08:15",
+          "zieladresse": {
+            "einrichtung": "Universitätsklinikum Köln",
+            "strasse": "Klinikplatz 1",
+            "plz": "50937",
+            "ort": "Köln"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "KTW",
+          "ausstattung": "Rollstuhl"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {},
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000019",
+          "belegnummer": "B00019",
+          "rechnungsnummer": "R00019",
+          "gesamt_brutto": 114,
+          "zuzahlung": 10,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 31
+        }
+      }
+    },
+    {
+      "patient_id": 20,
+      "display_name": "Testperson 20",
+      "birthdate": "1990-05-21",
+      "versichertennummer": "X000000020",
+      "anschrift": {
+        "strasse": "Musterweg 20",
+        "plz": "10020",
+        "ort": "Berlin"
+      },
+      "krankenkasse": {
+        "name": "AOK Test",
+        "ikNummer": "100000020"
+      },
+      "versichertenstatus": "Mitglied",
+      "zuzahlungsbefreiung": {
+        "status": true,
+        "gueltig_bis": "2027-12-31"
+      },
+      "transportdaten": {
+        "szenario": "Wartezeit Serienbehandlung",
+        "fahrtart": "Hin- und Rückfahrt",
+        "unfallbezug": "kein Unfallbezug",
+        "grund_der_befoerderung": {
+          "kategorie": "Genehmigungspflichtige Fahrt",
+          "grund": "Wartezeit Serienbehandlung"
+        },
+        "behandlung": {
+          "bezeichnung": "Wartezeit Serienbehandlung",
+          "von": "2026-11-01",
+          "haeufigkeit": "3x pro Woche",
+          "bis_voraussichtlich": "2027-01-31", 
+          "termin_uhrzeit": "08:30",
+          "abholzeit_geplant": "07:45",
+          "zieladresse": {
+            "einrichtung": "Dialysezentrum Berlin Mitte",
+            "strasse": "Nierenweg 6",
+            "plz": "10178",
+            "ort": "Berlin"
+        },
+        "hinfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "rueckfahrt": {
+          "befoerderungsart": "Taxi",
+          "ausstattung": "keine"
+        },
+        "sonstiges": {
+          "wartezeit_min": 60
+        },
+        "bestaetigung_versicherter": {
+          "datum": "2026-11-15",
+          "hinfahrt_bestaetigt": true,
+          "rueckfahrt_bestaetigt": true,
+          "unterschrieben": true,
+          "vertretung_durch_dritte_person": false,
+          "hinfahrt": {
+            "von": "Wohnanschrift",
+            "nach": "Behandlungsort"
+          },
+          "rueckfahrt": {
+            "von": "Behandlungsort",
+            "nach": "Wohnanschrift"
+          }
+        },
+        "bestaetigung_transporteur": {
+          "datum": "2026-11-15"
+        },
+        "abrechnung_transporteur": {
+          "ik_transporteur": "440000020",
+          "belegnummer": "B00020",
+          "rechnungsnummer": "R00020",
+          "gesamt_brutto": 115,
+          "zuzahlung": 0,
+          "positionsnummer": "06010001",
+          "anzahl": 1,
+          "km": 32
+        }
+      }
+    }
+  ]
+}

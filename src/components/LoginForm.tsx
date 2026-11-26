@@ -19,12 +19,12 @@ export function LoginForm({ demo }: { demo: boolean }) {
     if (demo) api("/api/demo/accounts").then((r) => setAccounts(r.accounts)).catch(() => {});
   }, [demo]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(e: React.FormEvent | null, creds = { email, password }) {
+    e?.preventDefault();
     setBusy(true);
     setErr("");
     try {
-      const r = await api("/api/auth/login", { body: { email, password } });
+      const r = await api("/api/auth/login", { body: creds });
       router.push(next && next.startsWith("/") ? next : r.home);
       router.refresh();
     } catch (e) {
@@ -37,7 +37,7 @@ export function LoginForm({ demo }: { demo: boolean }) {
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-4 py-10">
       <div className="flex items-center justify-between"><Logo size={32} /><LangToggle /></div>
       <Card title={L("Sign in", "Anmelden")}>
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={(e) => submit(e)} className="space-y-4">
           <Field label={L("Email", "E-Mail")}><Input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.de" /></Field>
           <Field label={L("Password", "Passwort")}><Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
           {err && <ErrorBox>{err}</ErrorBox>}
@@ -45,10 +45,10 @@ export function LoginForm({ demo }: { demo: boolean }) {
         </form>
       </Card>
       {demo && accounts.length > 0 && (
-        <Card title={L("Demo accounts (password: demo)", "Demo-Konten (Passwort: demo)")} tone="cyan">
+        <Card title={L("Demo accounts: click one to sign in", "Demo-Konten: anklicken zum Anmelden")} tone="cyan">
           <div className="grid gap-2 sm:grid-cols-2">
             {accounts.map((a) => (
-              <button key={a.email} onClick={() => { setEmail(a.email); setPassword("demo"); }} className="rounded-xl border border-line bg-white px-3 py-2 text-left text-sm hover:border-cyan">
+              <button key={a.email} onClick={() => submit(null, { email: a.email, password: "demo" })} className="rounded-xl border border-line bg-white px-3 py-2 text-left text-sm hover:border-cyan">
                 <span className="block font-medium text-ink">{a.name}</span>
                 <span className="block text-xs text-muted">{a.email}</span>
               </button>

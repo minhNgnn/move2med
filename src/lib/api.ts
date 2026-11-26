@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { ZodError } from "zod";
 import { db, schema } from "@/db";
 import { getSession, getPatientSession } from "./session";
 import type { Role, Session } from "./types";
@@ -21,6 +22,7 @@ export function handle<T>(fn: (req: NextRequest, ctx: Ctx) => Promise<T>) {
       const out = await fn(req, ctx);
       return out instanceof Response ? out : NextResponse.json(out ?? { ok: true });
     } catch (e) {
+      if (e instanceof ZodError) return NextResponse.json({ error: "Invalid input", code: "invalid", issues: e.issues.map((i) => `${i.path.join(".")}: ${i.message}`) }, { status: 400 });
       if (e instanceof HttpError) return NextResponse.json({ error: e.message, code: e.code }, { status: e.status });
       console.error(e);
       return NextResponse.json({ error: "Internal error" }, { status: 500 });

@@ -1,66 +1,76 @@
-# move2med: Healthcare Hackathon Bayern, Challenge #1 (gematik)
+# move2med
 
-**Digital Patient Transport: From Paper Form to Digital Workflow**
+**Healthcare Hackathon Bayern · Challenge #1 (gematik): Digital Patient Transport, from paper form to digital workflow.**
 
-> Let taxi and patient-transport companies, which are **not on Germany's Telematics Infrastructure**, securely read the
-> upcoming e-prescription for patient transport, and let patients (often elderly) **confirm the trip** digitally so the
-> company can bill the insurer.
+Transport companies (taxis, patient-transport ambulances) are not on Germany's Telematics Infrastructure, so they cannot
+read the coming e-prescription for patient transport. move2med gives them one thing: a **ride key**.
 
-## Start here
+- The **patient** hands the key (QR / short code, printed on a letter) to a company of their choice. No account.
+- The **company** redeems key + date of birth, sees a minimal **Trip Card**, checks the **fleet match**, accepts, assigns.
+- The **driver app** works **offline**. The patient taps their health card (simulated; real tap detection on Android Chrome),
+  the phone signs the event, and the proof is verified when the connection returns.
+- The **insurer** approves trips, registers companies, sees an **audit log** of every key redemption, and **verifies every
+  layer of every proof** before paying.
 
-1. **[docs/challenge/CHALLENGE_EXPLAINED.md](docs/challenge/CHALLENGE_EXPLAINED.md)**: the whole challenge in plain English (actors, today's process, gematik's target process, the 3 questions, scope, demo idea, questions for mentors)
-2. [docs/challenge/challenge_slides_transcript.md](docs/challenge/challenge_slides_transcript.md): what was on the 4 slides
-3. [data/DATA_DICTIONARY.md](data/DATA_DICTIONARY.md): the mock JSON explained field by field, the 20 scenarios, and the rule conflicts found in it
-4. [docs/GLOSSARY.md](docs/GLOSSARY.md): German ↔ English terms
+Background, translations of the source documents and the full plan: [docs/](docs/) (start with
+[docs/challenge/CHALLENGE_EXPLAINED.md](docs/challenge/CHALLENGE_EXPLAINED.md), [docs/PLAN.md](docs/PLAN.md)).
+Demo runbook: [docs/DEMO.md](docs/DEMO.md).
 
-## Layout
+## Run it
 
-```
-move2med/
-├── README.md
-├── data/
-│   ├── DATA_DICTIONARY.md
-│   ├── raw/update_vollständig_testdatensatz_20.json   # original from organisers (invalid JSON, untouched)
-│   └── clean/testdatensatz_20.json                     # repaired, valid. USE THIS
-├── scripts/
-│   └── repair_json.py                                  # raw → clean (python3, stdlib only)
-└── docs/
-    ├── challenge/
-    │   ├── CHALLENGE_EXPLAINED.md
-    │   └── challenge_slides_transcript.md
-    ├── translations/                                   # English working translations (unofficial)
-    │   ├── impulspapier_EN.md                          # gematik working-group paper (the target process)
-    │   ├── muster4_form_guide_EN.md                    # the paper form, every field, front + back
-    │   └── gematik_brand_guide_EN.md                   # logo rules + observed colors and fonts
-    ├── GLOSSARY.md
-    ├── TECH_CONTEXT.md                                 # eRezept token, PoPP, ZETA, WANDA, links
-    ├── images/
-    │   ├── challenge_slides/                           # photos of the 4 challenge slides
-    │   ├── impulspapier_soll_prozess.png               # gematik target-process diagram
-    │   ├── muster4_front_numbered.png                  # form front with field numbers ❶–⓱
-    │   ├── muster4_official_front.png
-    │   └── muster4_official_back.png                   # patient confirmation + billing block
-    └── source/                                         # original German documents
-        ├── gematik_Impulspapier_Krankentransport.pdf
-        ├── gematik_news_impulspapier.html
-        ├── KVHH_Krankenbefoerderung_Vordruckerlaeuterungen.pdf
-        ├── KBV_Muster4_official_front_back_7-2020.pdf
-        └── gematik_Markenleitfaden_Dachmarke.pdf
+```bash
+pnpm install
+docker run -d --name move2med-pg -e POSTGRES_PASSWORD=move2med -e POSTGRES_DB=move2med -p 5433:5432 postgres:16-alpine
+cp .env.example .env.local        # set DATABASE_URL=postgres://postgres:move2med@localhost:5433/move2med
+pnpm db:push && pnpm seed
+pnpm dev                          # http://localhost:3100
 ```
 
-## Using the data
+All demo accounts use the password `demo`. `/demo` lists every ride key and has a **reset** button.
 
-```python
-import json
-records = json.load(open("data/clean/testdatensatz_20.json", encoding="utf-8"))["testdaten"]
+| Role | Page | Account |
+|---|---|---|
+| Doctor | `/doctor` | doctor@demo.med |
+| Insurer | `/insurer` | insurer@demo.med |
+| Transport company | `/dispatch` | dispatch.spree@demo.med (Berlin, KTW fleet), dispatch.berlintaxi@demo.med (taxis only) |
+| Driver (phone) | `/driver` | driver.spree@demo.med |
+| Patient / relative | `/status` | ride key + date of birth |
+
+Language: English by default, one click to German (top right).
+
+## Tests
+
+```bash
+node scripts/smoke.mjs            # hero flow: issue → approve → redeem → accept → assign → sign → bill → verify
+node scripts/smoke-cases.mjs      # #13 co-payment, #10 proxy, #18 heavy-duty, key revoke/reassign, suspend
+node scripts/e2e-driver.mjs       # real Chromium: offline ride, reload offline, encrypted storage, sync, remote wipe
 ```
+The first two need a running server; the last needs a **production** server (`pnpm build && pnpm start -p 3100`) and
+`pnpm add -D playwright && pnpm exec playwright install chromium`.
 
-Each record = one Muster 4 (front + back) for one synthetic patient, with one scenario each (dialysis, carry chair,
-bariatric, proxy signature, …). All data is synthetic.
+## How it is built
 
-## Source links
+- **Next.js 16** (App Router) + TypeScript + Tailwind v4, **Postgres + Drizzle**. One repo, one deployment.
+- **Mock Fachdienst**: the organisers' 20 JSON records ([data/clean/](data/clean/), repaired copy of the raw file) are the
+  prescriptions. Everything outside our scope (doctor's software, TI, PoPP service) is a mock behind the same shape.
+- **Ride key**: derived from an HMAC, stored only as a keyed hash; redeemed with the patient's date of birth; binds to the
+  first company that accepts; revocable; reassigning issues a new key. Rate-limited, every redemption audited.
+- **Data minimisation**: before accepting, a company sees a preview without name, phone or street. The doctor's medical
+  justification never leaves the insurer; companies only learn that it exists.
+- **Rules engine** (`src/lib/rules.ts`): flags, never silently fixes. KTW without justification, co-payment errors
+  (incl. accident / BVG), approval pending, different vehicles outbound/return, fleet mismatch, unverified proof.
+- **Three-layer proof** per ride: (1) mock PoPP token for the patient, (2) ECDSA P-256 signature from the driver's device
+  (private key non-extractable), (3) gateway countersignature. The insurer re-verifies all three.
+- **Offline driver app**: PWA + service worker, ride data AES-GCM encrypted in IndexedDB, append-only signed event log
+  with device-generated IDs (idempotent), server-anchored trusted time checked against GPS, evidence never discarded
+  (anything odd goes to an insurer review queue), remote revoke wipes the phone.
 
-- Challenge provider: gematik, <https://www.gematik.de>, <https://github.com/gematik>, <https://fachportal.gematik.de/>
-- Impulspapier: <https://www.gematik.de/newsroom/news-detail/impulspapier-fuer-digitale-verordnung-von-krankenbefoerderung>
-- Form explanation (KV Hamburg): <https://www.kvhh.net/_Resources/Persistent/8/5/6/0/85600cd58d37e3eef1dc660cee2da7909097480c/Krankenbefoerdeung-Vordruckerlaeuterungen.pdf>
-- Brand guide: <https://www.gematik.de/media/gematik/Medien/Newsroom/Mediaservice/Logo/gematik_Markenleitfaden_Dachmarke_web.pdf>
+## Honest limitations
+
+- The health-card tap is **detected, not read** (Android Chrome: Web NFC `readingerror`; elsewhere a demo button). Reading
+  the card needs gematik's native PoPP client. The patient proof is a signed **mock** PoPP token.
+- Phone clock tampering is detected within a session (monotonic clock) but only flagged after an app restart.
+- Rate limiting is in-memory per server instance. Background Sync works on Android Chrome only; iOS syncs on reopen,
+  reconnect and a 20 s timer.
+- No real SMS (an in-app inbox simulates it), no real billing transfer (a downloadable JSON stands in for § 302 / TP5).
+- `docs/source/` (gematik's copyrighted Impulspapier etc.) is not committed; see the links in the docs.

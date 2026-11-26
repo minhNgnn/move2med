@@ -263,7 +263,7 @@ function RideCard({ ride, open, unsynced, offline, onToggle, onAct, onTap }: { r
             <Badge tone={ride.leg === "hin" ? "info" : "neutral"}>{ride.leg === "hin" ? L("Outbound", "Hinfahrt") : L("Return", "Rückfahrt")}</Badge>
           </div>
           <p className="mt-1 text-lg font-medium text-ink">{ride.patient.name}</p>
-          <p className="text-sm text-muted">{ride.to.name ?? addr(ride.to)}</p>
+          <p className="text-sm text-muted">{ride.leg === "hin" ? (ride.to.name ?? addr(ride.to)) : addr(ride.to)}</p>
         </div>
         <div className="flex flex-col items-end gap-1.5">
           {done ? <Badge tone="good"><Check className="h-3 w-3" /> {L("done", "fertig")}</Badge> : started ? <Badge tone="warn">{L("on the way", "unterwegs")}</Badge> : <Badge>{L("ready", "bereit")}</Badge>}

@@ -60,6 +60,7 @@ async function decrypt<T>(aes: CryptoKey, row: Enc): Promise<T> {
 
 // ---------------------------------------------------------------- rides
 export async function loadRides(): Promise<DriverRide[]> {
+  if (!keyCache && !(await getKV("keys"))) return []; // wiped or never set up: do not create keys just to read nothing
   const { aes } = await ensureKeys();
   const rows = await db.rides.toArray();
   const out: DriverRide[] = [];

@@ -88,10 +88,34 @@ function Approvals({ items, reload }: { items: any[]; reload: () => void }) {
   );
 }
 
+function RegisterCompany({ onDone }: { onDone: () => void }) {
+  const { L } = useLang();
+  const empty = { name: "", ik: "", city: "", dispatcherName: "", dispatcherEmail: "", password: "" };
+  const [f, setF] = useState(empty);
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
+  const set = (k: keyof typeof empty) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
+  return (
+    <Card title={L("Register a new transport company", "Neues Transportunternehmen registrieren")}>
+      <form onSubmit={async (e) => { e.preventDefault(); setErr(""); setOk(""); try { await api("/api/insurer/companies", { body: f }); setOk(L(`${f.name} is registered. Its dispatcher can sign in now.`, `${f.name} ist registriert. Der Disponent kann sich jetzt anmelden.`)); setF(empty); onDone(); } catch (x) { setErr((x as Error).message); } }} className="grid gap-3 md:grid-cols-3">
+        <Input placeholder={L("Company name", "Firmenname")} value={f.name} onChange={set("name")} required />
+        <Input placeholder="IK (9 digits)" value={f.ik} onChange={set("ik")} inputMode="numeric" maxLength={9} required />
+        <Input placeholder={L("City", "Ort")} value={f.city} onChange={set("city")} required />
+        <Input placeholder={L("Dispatcher name", "Name Disponent")} value={f.dispatcherName} onChange={set("dispatcherName")} required />
+        <Input type="email" placeholder={L("Dispatcher email", "E-Mail Disponent")} value={f.dispatcherEmail} onChange={set("dispatcherEmail")} required />
+        <Input type="password" placeholder={L("Initial password", "Startpasswort")} value={f.password} onChange={set("password")} required />
+        <div className="md:col-span-3 flex items-center gap-3"><Button type="submit">{L("Register company", "Unternehmen registrieren")}</Button>{err && <span className="text-sm text-bad">{err}</span>}{ok && <span className="text-sm text-good">{ok}</span>}</div>
+      </form>
+    </Card>
+  );
+}
+
 function Companies() {
   const { L } = useLang();
   const { data, reload } = usePoll<{ companies: any[] }>("/api/insurer/companies", 4000);
   return (
+    <div className="space-y-5">
+    <RegisterCompany onDone={reload} />
     <Card title={L("Registered transport companies", "Registrierte Transportunternehmen")}>
       <p className="mb-3 text-sm text-muted">{L("Only registered companies (by IK number) can redeem ride keys. Suspend one and its key redemptions stop at once.", "Nur registrierte Unternehmen (per IK-Nummer) können Fahrtschlüssel einlösen. Eine Sperre wirkt sofort.")}</p>
       <Table head={[L("Company", "Unternehmen"), "IK", L("City", "Ort"), L("Vehicles", "Fahrzeuge"), "Status", ""]}>
@@ -108,6 +132,7 @@ function Companies() {
         ))}
       </Table>
     </Card>
+    </div>
   );
 }
 

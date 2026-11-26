@@ -9,7 +9,8 @@ import type { Role } from "@/lib/types";
 
 export const POST = handle(async (req) => {
   const body = z.object({ email: z.string().min(3), password: z.string().min(1) }).parse(await req.json());
-  rateLimit(`login:${clientIp(req)}`, 30, 60_000);
+  rateLimit(`login-ip:${clientIp(req)}`, 150, 60_000);
+  rateLimit(`login:${body.email.trim().toLowerCase()}`, 12, 60_000); // per account: the real brute-force guard
   const [u] = await db.select().from(schema.users).where(eq(schema.users.email, body.email.trim().toLowerCase()));
   if (!u || !verifyPassword(body.password, u.passwordHash)) throw new HttpError(401, "Wrong email or password", "bad_credentials");
   await setSession({ uid: u.id, role: u.role as Role, companyId: u.companyId, name: u.name });

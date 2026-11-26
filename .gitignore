@@ -17,3 +17,5 @@ next-env.d.ts
 docs/source/
 docs/images/challenge_slides/
 docs/images/impulspapier_soll_prozess.png
+.vercel
+.env*

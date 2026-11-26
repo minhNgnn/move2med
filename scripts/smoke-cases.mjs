@@ -14,8 +14,10 @@ class Client {
   login = (e) => this.post("/api/auth/login", { email: e, password: "demo" });
 }
 const step = (t) => console.log(`\n${t}`);
-await new Client().post("/api/demo/reset");
-const keys = (await new Client().get("/api/demo/keys")).keys;
+const admin = new Client();
+await admin.post("/api/demo/unlock", { pin: process.env.DEMO_ADMIN_PIN ?? "x" });
+await admin.post("/api/demo/reset");
+const keys = (await admin.get("/api/demo/keys")).keys;
 const key = (n) => keys.find((k) => k.patientId === n);
 
 async function phone(email) {
@@ -105,5 +107,93 @@ step("insurer can suspend a company");
   ok((await d.post("/api/dispatch/redeem", { code: k.code, dob: k.dob })).status === 403, "suspended company cannot redeem");
   await i.call("PATCH", "/api/insurer/companies/c_rhein", { status: "registered" });
 }
+
+import { createHash } from "node:crypto";
+const sha = (t) => createHash("sha256").update(t).digest("hex");
+async function accepted(num, dispatchEmail, vehicleId, driverEmail) {
+  const k = key(num), d = new Client(); await d.login(dispatchEmail);
+  await d.post("/api/dispatch/accept", { code: k.code, dob: k.dob });
+  const f = await d.get("/api/dispatch/fleet");
+  const jobs = (await d.get("/api/dispatch/jobs")).rides.filter((r) => r.prescriptionId === k.prescriptionId);
+  for (const r of jobs) await d.post(`/api/dispatch/rides/${r.id}/assign`, { vehicleId, driverId: f.drivers[0].id });
+  const ph = await phone(driverEmail);
+  const hin = (await ph.sync()).rides.find((r) => r.prescriptionId === k.prescriptionId && r.leg === "hin");
+  return { k, d, ph, hin, f };
+}
+const ins = new Client(); await ins.login("insurer@demo.med");
+const reviewOf = async (rideId) => (await ins.get("/api/insurer/review")).items.find((i) => i.rideId === rideId);
+
+step("review queue: phone clock disagrees with the server-anchored time (+ waiting time)");
+{
+  const { d, ph, hin } = await accepted(3, "dispatch.rhein@demo.med", "v_rhein_taxi1", "driver.rhein@demo.med");
+  const skew = ph.ev(hin, "tap", { method: "card_tap", challenge: hin.nonce, anchoredTime: new Date(Date.now() - 3600_000).toISOString() });
+  await ph.sync([await ph.sign(ph.ev(hin, "pickup")), await ph.sign(ph.ev(hin, "wait", { waitMin: 45 })), await ph.sign(skew), await ph.sign(ph.ev(hin, "dropoff"))]);
+  const job = (await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id);
+  ok(job.waitMin === 45, "waiting time (45 min) recorded from the driver's event");
+  ok(job.proof?.status === "needs_review" && job.proof.flags.includes("clock_mismatch"), "proof goes to REVIEW with flag clock_mismatch, not silently accepted");
+  const item = await reviewOf(hin.id);
+  ok(!!item, "it shows up in the insurer's review queue");
+  ok((await ins.post(`/api/insurer/review/${item.id}`, { decision: "accept", note: "Driver confirmed by phone" })).ok, "insurer accepts it with a note");
+  ok((await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id).proof.status === "verified", "proof is now verified, with the decision in the audit log");
+}
+
+step("review queue: ride cancelled while the driver was offline");
+{
+  const { k, ph, hin } = await accepted(8, "dispatch.spree@demo.med", "v_spree_taxi1", "driver.spree@demo.med");
+  const pat = new Client(); await pat.post("/api/patient/login", { code: k.code, dob: k.dob });
+  await pat.post("/api/patient/reassign"); // the patient chose another company while the phone had no signal
+  await ph.sync([await ph.sign(ph.ev(hin, "pickup")), await ph.sign(ph.ev(hin, "tap", { method: "card_tap", challenge: hin.nonce })), await ph.sign(ph.ev(hin, "dropoff"))]);
+  const item = await reviewOf(hin.id);
+  ok(item?.flags.includes("ride_changed"), "evidence is kept and flagged ride_changed instead of being dropped");
+  ok((await ins.post(`/api/insurer/review/${item.id}`, { decision: "reject" })).ok, "insurer can reject it");
+}
+
+step("review queue: events from a phone revoked in the meantime");
+{
+  const { d, ph, hin } = await accepted(7, "dispatch.rhein@demo.med", "v_rhein_taxi1", "driver.rhein@demo.med");
+  await d.post(`/api/dispatch/devices/${ph.deviceId}/revoke`);
+  const r = await ph.sync([await ph.sign(ph.ev(hin, "pickup")), await ph.sign(ph.ev(hin, "tap", { method: "card_tap", challenge: hin.nonce }))]);
+  ok(r.deviceStatus === "revoked" && r.rides.length === 0, "phone is told it was revoked and gets no rides");
+  ok((await reviewOf(hin.id))?.flags.includes("device_revoked"), "its late evidence is flagged device_revoked for review");
+}
+
+step("PIN fallback: wrong PIN is rejected, the right one verifies");
+{
+  const { k, d, ph, hin } = await accepted(9, "dispatch.elbe@demo.med", "v_elbe_taxi1", "driver.elbe@demo.med");
+  const bad = ph.ev(hin, "tap", { method: "pin", challenge: hin.nonce }); bad.pinCheck = sha("000000" + bad.id);
+  await ph.sync([await ph.sign(ph.ev(hin, "pickup")), await ph.sign(bad)]);
+  ok((await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id).proof.status === "rejected", "wrong PIN -> proof rejected");
+  const good = ph.ev(hin, "tap", { method: "pin", challenge: hin.nonce }); good.pinCheck = sha(k.pin + good.id);
+  await ph.sync([await ph.sign(good)]);
+  const p = (await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id).proof;
+  ok(p.status === "verified" && p.method === "pin", "retry with the PIN from the letter -> verified");
+}
+
+step("a tap for the wrong ride (challenge mismatch) is rejected");
+{
+  const { d, ph, hin } = await accepted(11, "dispatch.rhein@demo.med", "v_rhein_ktw1", "driver.rhein@demo.med");
+  await ph.sync([await ph.sign(ph.ev(hin, "pickup")), await ph.sign(ph.ev(hin, "tap", { method: "card_tap", challenge: "0000000000000000" }))]);
+  ok((await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id).proof.status === "rejected", "challenge from another ride -> rejected");
+}
+
+step("onboarding: insurer registers a company, the company adds fleet and a driver");
+{
+  const reg = { name: "Neu Krankenfahrten", ik: "440900001", city: "Berlin", dispatcherName: "Nora Neu", dispatcherEmail: "nora@neu.example", password: "start123" };
+  ok((await ins.post("/api/insurer/companies", reg)).ok, "company registered");
+  ok((await ins.post("/api/insurer/companies", reg)).status === 409, "same IK again -> 409");
+  ok((await ins.post("/api/insurer/companies", { ...reg, ik: "12" })).status === 400, "invalid IK -> 400");
+  const n = new Client();
+  ok((await n.post("/api/auth/login", { email: "nora@neu.example", password: "start123" })).role === "dispatcher", "the new dispatcher can sign in");
+  ok((await n.post("/api/dispatch/vehicles", { label: "Rolli 1", plate: "B-NK 1", type: "taxi", equipment: ["rollstuhl"] })).ok, "adds a wheelchair rental car");
+  ok((await n.post("/api/dispatch/drivers", { name: "Dan Neu", email: "dan@neu.example", password: "start123" })).ok, "adds a driver");
+  ok((await new Client().post("/api/auth/login", { email: "dan@neu.example", password: "start123" })).role === "driver", "the driver can sign in");
+  const k = key(16 === 16 ? 6 : 6);
+  const red = await n.post("/api/dispatch/redeem", { code: k.code, dob: k.dob });
+  ok(red.vehicles.length === 1 && red.card.mode === "preview", "new company sees only its own one-vehicle fleet");
+  const plain = new Client(); await plain.login("dispatch.isar@demo.med");
+  ok((await plain.post("/api/dispatch/vehicles", { label: "X", plate: "XX 1", type: "ktw", equipment: [] })).ok, "other companies manage their own fleets");
+  ok((await new Client().post("/api/dispatch/vehicles", { label: "X", plate: "XX 1", type: "ktw", equipment: [] })).status === 401, "anonymous cannot add vehicles");
+}
+
 console.log(failures ? `\n${failures} check(s) FAILED` : "\nAll case checks passed");
 process.exit(failures ? 1 : 0);

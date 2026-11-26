@@ -303,10 +303,32 @@ function RideCard({ ride, open, unsynced, offline, onToggle, onAct, onTap }: { r
             </div>
           )}
           {done && !hasProof && <Button variant="secondary" className="w-full" onClick={onTap}><CreditCard className="h-4 w-4" /> {L("Add patient confirmation", "Bestätigung nachtragen")}</Button>}
+          {(started || done) && <WaitControl ride={ride} onSave={(m) => onAct(ride, "wait", { waitMin: m })} />}
           {offline && (started || done) && <p className="text-xs text-muted">{L("Saved on this phone. It will sync when you are online.", "Auf diesem Handy gespeichert. Wird synchronisiert, sobald Sie online sind.")}</p>}
         </div>
       )}
     </article>
+  );
+}
+
+function WaitControl({ ride, onSave }: { ride: DriverRide; onSave: (m: number) => Promise<void> }) {
+  const { L } = useLang();
+  const [min, setMin] = useState(ride.waitMin ?? 0);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { setMin(ride.waitMin ?? 0); }, [ride.waitMin]);
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 ring-1 ring-line">
+      <div>
+        <p className="text-sm font-medium text-ink">{L("Waiting time", "Wartezeit")}</p>
+        <p className="text-xs text-muted">{L("Minutes you waited for the patient or the treatment", "Minuten, die Sie auf Patient oder Behandlung gewartet haben")}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="h-9 w-9 rounded-lg border border-line text-lg" onClick={() => { setMin(Math.max(0, min - 15)); setSaved(false); }} aria-label="-15">−</button>
+        <span className="w-14 text-center font-mono text-lg">{min}′</span>
+        <button className="h-9 w-9 rounded-lg border border-line text-lg" onClick={() => { setMin(min + 15); setSaved(false); }} aria-label="+15">+</button>
+        <Button size="sm" variant={saved ? "good" : "secondary"} onClick={async () => { await onSave(min); setSaved(true); }}>{saved ? <Check className="h-4 w-4" /> : L("Save", "Speichern")}</Button>
+      </div>
+    </div>
   );
 }
 

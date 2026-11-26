@@ -6,6 +6,7 @@ import { api, eur, fmtDate, fmtDateTime, usePoll } from "@/lib/hooks";
 import { useLang } from "@/lib/lang";
 import { isBusy, matchVehicle, type VehicleLite } from "@/lib/fleet";
 import type { Equip, Flag, VType } from "@/lib/types";
+import { QrScanner } from "./QrScanner";
 import { Badge, Button, Card, Empty, ErrorBox, Field, FlagList, Input, KV, Select, Table, Tabs, Td } from "./ui";
 
 type Tab = "redeem" | "jobs" | "fleet" | "billing";
@@ -64,6 +65,7 @@ function RedeemTab({ onDone }: { onDone: () => void }) {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [scanning, setScanning] = useState(false);
 
   async function lookup(c = code, d = dob) {
     setBusy(true); setErr("");
@@ -97,11 +99,13 @@ function RedeemTab({ onDone }: { onDone: () => void }) {
           <Button type="submit" size="lg" loading={busy} disabled={code.length < 8 || dob.length < 8}>{L("Look up", "Abrufen")}</Button>
           <div>
             <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && scan(e.target.files[0])} />
-            <Button type="button" variant="secondary" size="lg" onClick={() => fileRef.current?.click()}><ScanLine className="h-5 w-5" /> {L("Scan QR", "QR scannen")}</Button>
+            <Button type="button" variant="secondary" size="lg" onClick={() => setScanning(true)}><ScanLine className="h-5 w-5" /> {L("Scan QR", "QR scannen")}</Button>
+            <button type="button" className="mt-1 block w-full text-center text-xs text-muted underline" onClick={() => fileRef.current?.click()}>{L("or use a photo", "oder Foto nutzen")}</button>
           </div>
         </form>
         {err && <div className="mt-4"><ErrorBox>{err}</ErrorBox></div>}
       </Card>
+      {scanning && <QrScanner onClose={() => setScanning(false)} onCode={(t) => { setScanning(false); setCode(extractCode(t)); }} />}
       {res && <TripCard key={res.card.prescriptionId + res.card.mode} res={res} code={code} dob={dob} refresh={async () => { await lookup(); onDone(); }} clear={() => { setRes(null); onDone(); }} />}
     </div>
   );
@@ -323,12 +327,58 @@ function JobsTab({ rides, reload }: { rides: any[]; reload: () => void }) {
 }
 
 // ------------------------------------------------------------------ fleet
+function AddVehicle({ onDone }: { onDone: () => void }) {
+  const { L } = useLang();
+  const [label, setLabel] = useState("");
+  const [plate, setPlate] = useState("");
+  const [type, setType] = useState<"taxi" | "ktw">("taxi");
+  const [eq, setEq] = useState<string[]>([]);
+  const [err, setErr] = useState("");
+  const names: Record<string, [string, string]> = { rollstuhl: ["wheelchair", "Rollstuhl"], tragestuhl: ["carry chair", "Tragestuhl"], liegend: ["stretcher", "Trage"], schwerlast: ["heavy-duty", "Schwerlast"] };
+  return (
+    <Card title={L("Add a vehicle", "Fahrzeug hinzufügen")}>
+      <form onSubmit={async (e) => { e.preventDefault(); setErr(""); try { await api("/api/dispatch/vehicles", { body: { label, plate, type, equipment: eq } }); setLabel(""); setPlate(""); setEq([]); onDone(); } catch (x) { setErr((x as Error).message); } }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Input placeholder={L("Name, e.g. KTW 3", "Name, z. B. KTW 3")} value={label} onChange={(e) => setLabel(e.target.value)} required />
+          <Input placeholder={L("Plate", "Kennzeichen")} value={plate} onChange={(e) => setPlate(e.target.value)} required />
+        </div>
+        <Select value={type} onChange={(e) => setType(e.target.value as "taxi" | "ktw")}><option value="taxi">Taxi / Mietwagen</option><option value="ktw">KTW</option></Select>
+        <div className="flex flex-wrap gap-3 text-sm">
+          {Object.keys(names).map((k) => <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={eq.includes(k)} onChange={(e) => setEq(e.target.checked ? [...eq, k] : eq.filter((x) => x !== k))} /> {L(...names[k])}</label>)}
+        </div>
+        {err && <ErrorBox>{err}</ErrorBox>}
+        <Button type="submit">{L("Add vehicle", "Fahrzeug hinzufügen")}</Button>
+      </form>
+    </Card>
+  );
+}
+
+function AddDriver({ onDone }: { onDone: () => void }) {
+  const { L } = useLang();
+  const [f, setF] = useState({ name: "", email: "", password: "" });
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
+  return (
+    <Card title={L("Add a driver", "Fahrer hinzufügen")}>
+      <form onSubmit={async (e) => { e.preventDefault(); setErr(""); setOk(""); try { await api("/api/dispatch/drivers", { body: f }); setOk(L(`${f.name} can sign in to the driver app now.`, `${f.name} kann sich jetzt in der Fahrer-App anmelden.`)); setF({ name: "", email: "", password: "" }); onDone(); } catch (x) { setErr((x as Error).message); } }} className="space-y-3">
+        <Input placeholder={L("Name", "Name")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} required />
+        <Input type="email" placeholder={L("Email", "E-Mail")} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} required />
+        <Input type="password" placeholder={L("Initial password", "Startpasswort")} value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} required />
+        {err && <ErrorBox>{err}</ErrorBox>}{ok && <p className="text-sm text-good">{ok}</p>}
+        <Button type="submit">{L("Add driver", "Fahrer hinzufügen")}</Button>
+      </form>
+    </Card>
+  );
+}
+
 function FleetTab() {
   const { L, lang } = useLang();
   const { data, reload } = usePoll<{ company: any; vehicles: Vehicle[]; devices: any[] }>("/api/dispatch/fleet", 3000);
   if (!data) return null;
   return (
     <div className="grid gap-5 lg:grid-cols-2">
+      <AddVehicle onDone={reload} />
+      <AddDriver onDone={reload} />
       <Card title={`${data.company?.name} · IK ${data.company?.ik}`}>
         <Table head={[L("Vehicle", "Fahrzeug"), L("Plate", "Kennzeichen"), L("Equipment", "Ausstattung")]}>
           {data.vehicles.map((v) => (

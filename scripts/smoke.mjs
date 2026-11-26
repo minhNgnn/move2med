@@ -24,7 +24,7 @@ const step = (t) => console.log(`\n${t}`);
 const doctor = new Client(), insurer = new Client(), spree = new Client(), taxi = new Client(), driver = new Client();
 
 step("0. reset demo");
-{ const r = await new Client().post("/api/demo/reset"); ok(r.ok, "demo reset"); }
+{ const c = new Client(); await c.post("/api/demo/unlock", { pin: process.env.DEMO_ADMIN_PIN ?? "x" }); const r = await c.post("/api/demo/reset"); ok(r.ok, "demo reset"); }
 
 step("1. doctor issues record #16 (carry-chair KTW)");
 await doctor.login("doctor@demo.med");

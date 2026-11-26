@@ -43,3 +43,16 @@ export async function setPatientSession(rx: string) {
 export async function clearPatientSession() {
   (await cookies()).delete(PATIENT_COOKIE);
 }
+
+export const DEMO_COOKIE = "m2m_demo";
+/** Demo controls (reset, full key list) need a PIN when DEMO_ADMIN_PIN is set (always set it on the public deployment). */
+export async function demoUnlocked() {
+  if (!process.env.DEMO_ADMIN_PIN) return true;
+  const c = (await cookies()).get(DEMO_COOKIE)?.value;
+  const p = c ? await readSession<{ demo?: boolean }>(c) : null;
+  return !!p?.demo;
+}
+export async function setDemoUnlocked() {
+  const token = await signSession({ demo: true }, "12h");
+  (await cookies()).set(DEMO_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 12 * 3600 });
+}

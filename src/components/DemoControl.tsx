@@ -5,17 +5,18 @@ import { useState } from "react";
 import { api, usePoll } from "@/lib/hooks";
 import { useL } from "@/lib/lang";
 import { LangToggle } from "./Shell";
-import { Badge, Button, Card, CodeChip, Logo, Table, Td } from "./ui";
+import { Badge, Button, Card, CodeChip, ErrorBox, Field, Input, Logo, Table, Td } from "./ui";
 
 type K = { prescriptionId: string; patientId: number; name: string; city: string; scenario: string; dob: string; code: string; pin: string; status: string; approval: string; keyStatus: string; bound: string | null };
 
 export function DemoControl() {
   const L = useL();
-  const { data, reload } = usePoll<{ keys: K[] }>("/api/demo/keys", 4000);
+  const { data, error, reload } = usePoll<{ keys: K[] }>("/api/demo/keys", 4000);
   const [busy, setBusy] = useState(false);
   const [accounts, setAccounts] = useState<{ id: string; name: string; role: string; company: string | null }[]>([]);
   const [open, setOpen] = useState(false);
 
+  if (error?.code === "locked") return <PinGate onDone={reload} />;
   return (
     <div className="mx-auto max-w-6xl space-y-5 px-4 py-6">
       <div className="flex items-center justify-between">
@@ -68,6 +69,24 @@ export function DemoControl() {
             </tr>
           ))}
         </Table>
+      </Card>
+    </div>
+  );
+}
+
+function PinGate({ onDone }: { onDone: () => void }) {
+  const L = useL();
+  const [pin, setPin] = useState("");
+  const [err, setErr] = useState("");
+  return (
+    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4">
+      <Logo size={32} />
+      <Card title={L("Demo controls are locked", "Demo-Steuerung ist gesperrt")}>
+        <form onSubmit={async (e) => { e.preventDefault(); setErr(""); try { await api("/api/demo/unlock", { body: { pin } }); onDone(); } catch (x) { setErr((x as Error).message); } }} className="space-y-4">
+          <Field label={L("Demo PIN", "Demo-PIN")}><Input type="password" value={pin} onChange={(e) => setPin(e.target.value)} autoFocus /></Field>
+          {err && <ErrorBox>{err}</ErrorBox>}
+          <Button type="submit" className="w-full">{L("Unlock", "Entsperren")}</Button>
+        </form>
       </Card>
     </div>
   );

@@ -13,6 +13,16 @@ export type ReasonCode = keyof typeof REASONS;
 
 export const HEAVY_KG = 150;
 
+/** Suggest the Muster 4 reason from the scenario text (the doctor can always change it). */
+export function guessReason(d: TransportData): ReasonCode {
+  const n = `${d.behandlung.bezeichnung} ${d.szenario}`.toLowerCase();
+  if (/dialyse|chemo|strahlen/.test(n)) return "d";
+  if (/stationär|aufnahme|entlassung/.test(n)) return "a";
+  if (/hospiz/.test(n)) return "c";
+  if (/mobilität/.test(n)) return "e";
+  return d.hinfahrt.befoerderungsart === "KTW" || d.rueckfahrt.befoerderungsart === "KTW" ? "f" : "b";
+}
+
 export function hasKtw(d: Pick<TransportData, "hinfahrt" | "rueckfahrt">) {
   return d.hinfahrt.befoerderungsart === "KTW" || d.rueckfahrt.befoerderungsart === "KTW";
 }

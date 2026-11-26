@@ -99,7 +99,7 @@ function RegisterCompany({ onDone }: { onDone: () => void }) {
     <Card title={L("Register a new transport company", "Neues Transportunternehmen registrieren")}>
       <form onSubmit={async (e) => { e.preventDefault(); setErr(""); setOk(""); try { await api("/api/insurer/companies", { body: f }); setOk(L(`${f.name} is registered. Its dispatcher can sign in now.`, `${f.name} ist registriert. Der Disponent kann sich jetzt anmelden.`)); setF(empty); onDone(); } catch (x) { setErr((x as Error).message); } }} className="grid gap-3 md:grid-cols-3">
         <Input placeholder={L("Company name", "Firmenname")} value={f.name} onChange={set("name")} required />
-        <Input placeholder="IK (9 digits)" value={f.ik} onChange={set("ik")} inputMode="numeric" maxLength={9} required />
+        <Input placeholder={L("IK (9 digits)", "IK (9 Ziffern)")} value={f.ik} onChange={set("ik")} inputMode="numeric" maxLength={9} required />
         <Input placeholder={L("City", "Ort")} value={f.city} onChange={set("city")} required />
         <Input placeholder={L("Dispatcher name", "Name Disponent")} value={f.dispatcherName} onChange={set("dispatcherName")} required />
         <Input type="email" placeholder={L("Dispatcher email", "E-Mail Disponent")} value={f.dispatcherEmail} onChange={set("dispatcherEmail")} required />

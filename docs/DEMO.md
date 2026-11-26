@@ -1,6 +1,6 @@
 # Demo runbook (5 minutes, record #16)
 
-Setup: `/demo` → **Reset demo data**. Open four windows: doctor, insurer, dispatcher (Spree), phone (driver). A second
+Setup: `/demo` (enter the demo PIN on the public site) → **Reset demo data**. Open four windows: doctor, insurer, dispatcher (Spree), phone (driver). A second
 dispatcher window (Berlin Taxi Zentrale) is the "wrong vehicle" moment.
 
 1. **The problem (slide 1).** Record #16 is a patient who needs a carry chair. Paper: the taxi shows up with the wrong vehicle.

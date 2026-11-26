@@ -19,6 +19,9 @@ export const POST = handle(async (req, ctx) => {
     decision === "approve"
       ? "move2med: Your insurer approved the transport. Your ride key is on the approval letter. Give it to a transport company."
       : `move2med: Your insurer could not approve the transport.${note ? ` Reason: ${note}` : ""}`,
+    decision === "approve"
+      ? "move2med: Ihre Krankenkasse hat die Fahrt genehmigt. Ihr Fahrtschlüssel steht im Brief. Geben Sie ihn an ein Transportunternehmen."
+      : `move2med: Ihre Krankenkasse konnte die Fahrt nicht genehmigen.${note ? ` Grund: ${note}` : ""}`,
   );
   await audit({ actorType: "user", actorId: s.uid, actorName: s.name, action: `approval.${decision}`, prescriptionId: id, detail: { note } });
   return { ok: true };

@@ -79,6 +79,7 @@ export async function audit(e: {
   });
 }
 
-export async function sendSms(prescriptionId: string, body: string) {
-  await db.insert(schema.sms).values({ prescriptionId, body });
+/** Both languages are stored; the status page shows the viewer's language. */
+export async function sendSms(prescriptionId: string, en: string, de?: string) {
+  await db.insert(schema.sms).values({ prescriptionId, body: JSON.stringify({ en, de: de ?? en }) });
 }

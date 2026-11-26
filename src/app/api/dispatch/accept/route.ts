@@ -25,7 +25,7 @@ export const POST = handle(async (req) => {
   if (!upd.length && rx.boundCompanyId !== company.id) throw new HttpError(409, "This trip was just accepted by another company.", "taken");
   if (upd.length) {
     await generateRides(upd[0], p, company.id);
-    await sendSms(rx.id, `move2med: ${company.name} accepted your trip. Pickup today at ${rx.data.behandlung.abholzeit_geplant}. You can follow it here with your key.`);
+    await sendSms(rx.id, `move2med: ${company.name} accepted your trip. Pickup today at ${rx.data.behandlung.abholzeit_geplant}. You can follow it here with your key.`, `move2med: ${company.name} hat Ihre Fahrt angenommen. Abholung heute um ${rx.data.behandlung.abholzeit_geplant} Uhr. Mit Ihrem Schlüssel können Sie sie hier verfolgen.`);
     await audit({ actorType: "user", actorId: s.uid, actorName: s.name, companyId: company.id, action: "key.accept", prescriptionId: rx.id, ip: clientIp(req) });
   }
   const [fresh] = await db.select().from(schema.prescriptions).where(eq(schema.prescriptions.id, rx.id));

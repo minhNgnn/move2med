@@ -12,7 +12,7 @@ type Status = {
   patient: { name: string; insurer: string }; status: string; approval: string; keyStatus: string; company: { name: string } | null;
   trip: { scenario: string; facility: { einrichtung: string; strasse: string; plz: string; ort: string }; appointment: string; frequency: string | null };
   rides: { id: string; leg: string; date: string; pickupTime: string; status: string; pickedUpAt: string | null; completedAt: string | null; vehicle: string | null; proof: string | null; proofMethod: string | null; confirmedByRelative: boolean }[];
-  messages: { id: number; at: string; body: string }[];
+  messages: { id: number; at: string; en: string; de: string }[];
 };
 
 export function StatusApp() {
@@ -146,7 +146,7 @@ function Dashboard({ d, reload }: { d: Status; reload: () => void }) {
         <div className="space-y-2">
           {d.messages.map((m) => (
             <div key={m.id} className="max-w-[92%] rounded-2xl rounded-tl-md bg-paper px-4 py-2.5 text-base">
-              <p>{m.body}</p>
+              <p>{L(m.en, m.de)}</p>
               <p className="mt-0.5 text-xs text-muted">{fmtTime(m.at, lang)}</p>
             </div>
           ))}

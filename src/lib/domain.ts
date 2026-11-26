@@ -49,6 +49,9 @@ export async function createPrescription(i: {
     ap.required
       ? "move2med: Your transport prescription was issued. The insurer is checking it. You will get your ride key with the decision."
       : "move2med: Your transport prescription is ready. Your ride key is on the letter. Give it to a transport company of your choice.",
+    ap.required
+      ? "move2med: Ihre Krankenfahrt wurde verordnet. Die Krankenkasse prüft sie. Ihren Fahrtschlüssel erhalten Sie mit der Entscheidung."
+      : "move2med: Ihre Krankenfahrt ist verordnet. Ihr Fahrtschlüssel steht im Brief. Geben Sie ihn an ein Transportunternehmen Ihrer Wahl.",
   );
   return { id, code, pin: await pinFor(id, 1) };
 }
@@ -178,7 +181,7 @@ export async function driverRidesFor(userId: string) {
       equipment: r.ride.equipment,
       vehicleLabel: r.vehicle?.label ?? null,
       weightKg: r.rx.data.sonstiges.gewicht_kg ?? null,
-      waitMin: r.rx.data.sonstiges.wartezeit_min ?? null,
+      waitMin: r.ride.waitMin ?? r.rx.data.sonstiges.wartezeit_min ?? null,
       shared: !!r.rx.data.sonstiges.gemeinschaftsfahrt,
       copay: {
         exempt: r.patient.exemption.status,
@@ -313,9 +316,11 @@ export async function ingestEvents(device: typeof schema.devices.$inferSelect, e
 async function notifyRide(ride: Ride, kind: "pickup" | "dropoff") {
   const hh = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   const leg = ride.leg === "hin" ? "outbound" : "return";
+  const legDe = ride.leg === "hin" ? "Hinfahrt" : "Rückfahrt";
   await sendSms(
     ride.prescriptionId,
     kind === "pickup" ? `move2med: Picked up at ${hh} (${leg} ride).` : `move2med: Arrived at ${hh}. Your ${leg} ride is complete.`,
+    kind === "pickup" ? `move2med: Um ${hh} abgeholt (${legDe}).` : `move2med: Um ${hh} angekommen. Ihre ${legDe} ist abgeschlossen.`,
   );
 }
 

@@ -26,7 +26,8 @@ pnpm db:push && pnpm seed
 pnpm dev                          # http://localhost:3100
 ```
 
-All demo accounts use the password `demo`. `/demo` lists every ride key and has a **reset** button.
+All demo accounts use the password `demo`. `/demo` lists every ride key and has a **reset** button. On a public deployment set
+`DEMO_ADMIN_PIN`: `/demo` (reset, full key list) then asks for it; locally, without the variable, it is open.
 
 | Role | Page | Account |
 |---|---|---|
@@ -61,6 +62,7 @@ The first two need a running server; the last needs a **production** server (`pn
   (incl. accident / BVG), approval pending, different vehicles outbound/return, fleet mismatch, unverified proof.
 - **Three-layer proof** per ride: (1) mock PoPP token for the patient, (2) ECDSA P-256 signature from the driver's device
   (private key non-extractable), (3) gateway countersignature. The insurer re-verifies all three.
+- **Onboarding**: an insurer registers a company (IK + first dispatcher); the dispatcher adds vehicles (type, equipment) and drivers.
 - **Offline driver app**: PWA + service worker, ride data AES-GCM encrypted in IndexedDB, append-only signed event log
   with device-generated IDs (idempotent), server-anchored trusted time checked against GPS, evidence never discarded
   (anything odd goes to an insurer review queue), remote revoke wipes the phone.

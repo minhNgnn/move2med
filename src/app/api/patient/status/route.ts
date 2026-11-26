@@ -29,6 +29,10 @@ export const GET = handle(async () => {
         confirmedByRelative: confirms.some((c) => c.rideId === r.id),
       }))
       .sort((a, b) => (a.date + a.pickupTime).localeCompare(b.date + b.pickupTime)),
-    messages: messages.map((m) => ({ id: m.id, at: m.at, body: m.body })),
+    messages: messages.map((m) => {
+      let t: { en: string; de: string };
+      try { t = JSON.parse(m.body); } catch { t = { en: m.body, de: m.body }; }
+      return { id: m.id, at: m.at, en: t.en, de: t.de };
+    }),
   };
 });

@@ -42,7 +42,7 @@ export const POST = handle(async (req, ctx) => {
   }
   await audit({ actorType: "user", actorId: s.uid, actorName: s.name, companyId: cid, action: "ride.assign", prescriptionId: ride.prescriptionId, rideId: id, detail: { vehicle: vehicle.label, driver: driver.name, applied: done.length, skipped } });
   if (ride.status === "planned") {
-    await sendSms(ride.prescriptionId, `move2med: Your ${ride.leg === "hin" ? "outbound" : "return"} ride is planned for ${ride.scheduledDate} at ${ride.pickupTime} with ${vehicle.label} (${vehicle.plate}), driver ${driver.name}.`);
+    await sendSms(ride.prescriptionId, `move2med: Your ${ride.leg === "hin" ? "outbound" : "return"} ride is planned for ${ride.scheduledDate} at ${ride.pickupTime} with ${vehicle.label} (${vehicle.plate}), driver ${driver.name}.`, `move2med: Ihre ${ride.leg === "hin" ? "Hinfahrt" : "Rückfahrt"} ist geplant: ${ride.scheduledDate} um ${ride.pickupTime} Uhr mit ${vehicle.label} (${vehicle.plate}), Fahrer ${driver.name}.`);
   }
   return { ok: true, applied: done.length, skipped };
 });

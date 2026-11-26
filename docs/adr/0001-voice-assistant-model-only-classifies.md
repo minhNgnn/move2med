@@ -1,0 +1,3 @@
+# The voice assistant's language model only classifies; the server writes every reply
+
+The model sees only the patient's sentence (never ride, name, date-of-birth or address data) and returns an Intent with an optional day and leg. Every spoken reply is built by the server from fixed German and English templates using the patient's real data. We rejected letting the model phrase the answer from ride facts: it would be friendlier but could state a wrong time or vehicle to an elderly patient, and it would send health data to a third party. Consequence: replies are less conversational, and a fixed set of templates must be maintained in both languages.

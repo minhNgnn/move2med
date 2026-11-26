@@ -99,7 +99,10 @@ function IssuedCard({ issued, onClose }: { issued: Issued; onClose: () => void }
           ) : (
             <p className="text-sm text-good"><ShieldCheck className="mr-1 inline h-4 w-4" />{L("No approval needed. The patient can hand the key to a transport company right now.", "Keine Genehmigung nötig. Der Patient kann den Schlüssel sofort an ein Transportunternehmen geben.")}</p>
           )}
-          <Link href={`/letter/${issued.id}`} target="_blank"><Button><Printer className="h-4 w-4" /> {L("Print letter for the patient", "Brief für den Patienten drucken")}</Button></Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/letter/${issued.id}`} target="_blank"><Button><Printer className="h-4 w-4" /> {L("Print letter for the patient", "Brief für den Patienten drucken")}</Button></Link>
+            <a href={`/api/prescriptions/${issued.id}/letter.pdf`} target="_blank" rel="noreferrer"><Button variant="secondary"><FileText className="h-4 w-4" /> PDF</Button></a>
+          </div>
         </div>
       </div>
     </Card>

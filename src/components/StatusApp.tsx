@@ -9,7 +9,7 @@ import { LangToggle } from "./Shell";
 import { Badge, Button, Card, CodeChip, ErrorBox, Field, Input, Logo } from "./ui";
 
 type Status = {
-  patient: { name: string; insurer: string }; status: string; approval: string; keyStatus: string; company: { name: string } | null;
+  patient: { name: string; insurer: string }; status: string; workflow?: string; approval: string; keyStatus: string; company: { name: string } | null;
   trip: { scenario: string; facility: { einrichtung: string; strasse: string; plz: string; ort: string }; appointment: string; frequency: string | null };
   rides: { id: string; leg: string; date: string; pickupTime: string; status: string; pickedUpAt: string | null; completedAt: string | null; vehicle: string | null; proof: string | null; proofMethod: string | null; confirmedByRelative: boolean }[];
   messages: { id: number; at: string; en: string; de: string }[];
@@ -94,6 +94,7 @@ function Dashboard({ d, reload }: { d: Status; reload: () => void }) {
             <h1 className="text-2xl font-semibold text-ink">{L("Hello", "Guten Tag")}, {d.patient.name}</h1>
             <p className="mt-1 text-muted">{d.trip.scenario} · {d.trip.facility.einrichtung}, {d.trip.facility.ort}</p>
           </div>
+          {d.workflow && <Badge title="FHIR Task status">{d.workflow}</Badge>}
           <button className="text-sm text-muted underline" onClick={async () => { await api("/api/patient/logout", { body: {} }); reload(); }}>{L("Leave", "Verlassen")}</button>
         </div>
         {revoked && <div className="mt-4"><ErrorBox>{L("You revoked your ride key. No company can use it any more.", "Sie haben Ihren Fahrtschlüssel widerrufen. Kein Unternehmen kann ihn mehr nutzen.")}</ErrorBox></div>}

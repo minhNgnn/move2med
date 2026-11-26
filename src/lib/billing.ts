@@ -20,7 +20,7 @@ export async function billingCandidates(companyId: string) {
       approval: { required: rx.approvalRequired, status: approvalStatus(rx) },
     }).filter((f) => f.severity === "error");
     const flags = [...ruleFlags];
-    if (!proof) flags.push({ code: "series_unconfirmed", severity: "error" });
+    if (!proof) flags.push(rx.data.behandlung.haeufigkeit ? { code: "series_unconfirmed", severity: "error", params: { date: ride.scheduledDate } } : { code: "no_proof", severity: "error" });
     else if (proof.status !== "verified") flags.push({ code: "unverified_proof", severity: "error" });
     return { ride, rx, p, proof, flags, eligible: flags.length === 0 };
   });

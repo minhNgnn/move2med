@@ -129,6 +129,8 @@ export function flagText(fl: Flag, L: (en: string, de: string) => string): strin
       return L(`Vehicle does not fit: missing ${miss}.`, `Fahrzeug passt nicht: es fehlt ${miss}.`);
     }
     case "series_unconfirmed":
+      return L(`Series date ${p.date ?? ""} has no confirmation from the patient yet.`, `Serientermin ${p.date ?? ""} hat noch keine Bestätigung des Patienten.`);
+    case "no_proof":
       return L("A completed ride has no verified proof.", "Eine abgeschlossene Fahrt hat keinen verifizierten Nachweis.");
     case "unverified_proof":
       return L("Proof is captured but not yet verified.", "Nachweis erfasst, aber noch nicht verifiziert.");

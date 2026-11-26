@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { handle, HttpError, requireUser, rateLimit, audit, clientIp } from "@/lib/api";
 import { findByKey, bodySchema, companyOrThrow } from "@/lib/keys";
-import { buildTripCard } from "@/lib/domain";
+import { buildTripCard, workflowStatus } from "@/lib/domain";
 
 export const POST = handle(async (req) => {
   const s = await requireUser(["dispatcher"]);
@@ -32,7 +32,7 @@ export const POST = handle(async (req) => {
   const drivers = (await db.select().from(schema.users).where(eq(schema.users.companyId, company.id))).filter((u) => u.role === "driver");
   const rides = await db.select().from(schema.rides).where(eq(schema.rides.companyId, company.id));
   return {
-    card: await buildTripCard(rx, p, mode),
+    card: { ...(await buildTripCard(rx, p, mode)), workflow: workflowStatus(rx, rides.filter((r) => r.prescriptionId === rx.id)) },
     company: { id: company.id, name: company.name },
     vehicles,
     drivers: drivers.map((d) => ({ id: d.id, name: d.name })),

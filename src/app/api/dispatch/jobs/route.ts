@@ -2,7 +2,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { handle, requireUser } from "@/lib/api";
 import { checkPrescription, type ReasonCode } from "@/lib/rules";
-import { approvalStatus } from "@/lib/domain";
+import { approvalStatus, todayStr } from "@/lib/domain";
 
 export const GET = handle(async () => {
   const s = await requireUser(["dispatcher"]);
@@ -34,7 +34,13 @@ export const GET = handle(async () => {
           vehicleLabel: vehicles.find((v) => v.id === ride.vehicleId)?.label ?? null,
           driverName: users.find((u) => u.id === ride.driverId)?.name ?? null,
           proof: proof ? { status: proof.status, method: proof.method, flags: proof.flags, tapTime: proof.tapTime } : null,
-          flags: rxFlags.get(rx.id) ?? [],
+          flags: [
+            ...(rxFlags.get(rx.id) ?? []),
+            // A series date in the past that was never driven or never confirmed is called out per date.
+            ...(rx.data.behandlung.haeufigkeit && ride.scheduledDate < todayStr() && ride.status !== "cancelled" && !(proof && proof.status === "verified")
+              ? [{ code: "series_unconfirmed", severity: "warn" as const, params: { date: ride.scheduledDate } }]
+              : []),
+          ],
         };
       })
       .sort((a, b) => (a.scheduledDate + a.pickupTime).localeCompare(b.scheduledDate + b.pickupTime)),

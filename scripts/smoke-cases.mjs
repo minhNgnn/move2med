@@ -195,5 +195,94 @@ step("onboarding: insurer registers a company, the company adds fleet and a driv
   ok((await new Client().post("/api/dispatch/vehicles", { label: "X", plate: "XX 1", type: "ktw", equipment: [] })).status === 401, "anonymous cannot add vehicles");
 }
 
+
+step("review queue: evidence arrives more than 24 h late / GPS time disagrees");
+{
+  const { ph, hin, d } = await accepted(6, "dispatch.isar@demo.med", "v_isar_taxi1", "driver.isar@demo.med");
+  ok(!!hin, "ride assigned to the phone");
+  const old = new Date(Date.now() - 30 * 3600_000), oldIso = old.toISOString();
+  const late = ph.ev(hin, "tap", { method: "card_tap", challenge: hin.nonce, deviceTime: oldIso, anchoredTime: oldIso, gps: { lat: 48, lon: 11, acc: 9, t: old.getTime() } });
+  late.deviceTime = oldIso; late.anchoredTime = oldIso;
+  await ph.sync([await ph.sign(late)]);
+  const job = (await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id);
+  ok(job.proof?.status === "needs_review" && job.proof.flags.includes("late_sync"), "30 h old evidence -> REVIEW with late_sync (not silently accepted)");
+}
+{
+  const { ph, hin, d } = await accepted(7, "dispatch.rhein@demo.med", "v_rhein_taxi1", "driver.rhein@demo.med");
+  const bad = ph.ev(hin, "tap", { method: "card_tap", challenge: hin.nonce, gps: { lat: 50.9, lon: 6.9, acc: 9, t: Date.now() - 3600_000 } });
+  await ph.sync([await ph.sign(bad)]);
+  const job = (await d.get("/api/dispatch/jobs")).rides.find((r) => r.id === hin.id);
+  ok(job.proof?.flags.includes("gps_time_mismatch") && job.proof.status === "needs_review", "GPS time 1 h off the event time -> REVIEW with gps_time_mismatch");
+}
+
+step("workflow status follows the FHIR Task lifecycle");
+{
+  const k = key(12), p = new Client(), d = new Client(); await d.login("dispatch.spree@demo.med");
+  await ins.post(`/api/insurer/approvals/${k.prescriptionId}`, { decision: "approve" });
+  await p.post("/api/patient/login", { code: k.code, dob: k.dob });
+  const w = async () => (await p.get("/api/patient/status")).workflow;
+  ok((await w()) === "ready", "approved and unbound -> ready");
+  const red = await d.post("/api/dispatch/redeem", { code: k.code, dob: k.dob });
+  ok(red.card.workflow === "ready", "Trip Card shows the same status");
+  await d.post("/api/dispatch/accept", { code: k.code, dob: k.dob });
+  ok((await w()) === "accepted", "bound -> accepted");
+  const f = await d.get("/api/dispatch/fleet");
+  const jobs = (await d.get("/api/dispatch/jobs")).rides.filter((r) => r.prescriptionId === k.prescriptionId);
+  for (const r of jobs) await d.post(`/api/dispatch/rides/${r.id}/assign`, { vehicleId: "v_spree_ktw1", driverId: f.drivers[0].id });
+  const ph = await phone("driver.spree@demo.med");
+  const hin = (await ph.sync()).rides.find((r) => r.prescriptionId === k.prescriptionId && r.leg === "hin");
+  await ph.sync([await ph.sign(ph.ev(hin, "pickup"))]);
+  ok((await w()) === "in-progress", "first pickup -> in-progress");
+  await p.post("/api/patient/revoke");
+}
+
+step("per-date cancellation of a series + SMS");
+{
+  const d = new Client(); await d.login("dispatch.spree@demo.med");
+  const jobs = (await d.get("/api/dispatch/jobs")).rides.filter((r) => r.prescriptionId === "rx_p20" && r.leg === "hin");
+  ok(jobs.length === 4, "series #20 has 4 dates");
+  const target = jobs[3];
+  ok((await d.post(`/api/dispatch/rides/${target.id}/cancel`)).ok, "one future date cancelled");
+  const after = (await d.get("/api/dispatch/jobs")).rides.filter((r) => r.prescriptionId === "rx_p20" && r.leg === "hin");
+  ok(after.filter((r) => r.status === "cancelled").length === 1 && after.filter((r) => r.status !== "cancelled").length === 3, "the other three dates are untouched");
+  const k = key(20), pat = new Client(); await pat.post("/api/patient/login", { code: k.code, dob: k.dob });
+  const sms = (await pat.get("/api/patient/status")).messages;
+  ok(sms.some((m) => /cancelled/.test(m.en) && /storniert/.test(m.de)), "patient gets a bilingual SMS about the cancelled date");
+  const ph = await phone("driver.spree@demo.med");
+  const mine = (await ph.sync()).rides;
+  ok(!mine.some((r) => r.id === target.id), "the cancelled ride disappears from the driver's phone");
+  const started = after.find((r) => r.status === "assigned");
+  await ph.sync([await ph.sign(ph.ev(mine.find((r) => r.id === started.id), "pickup"))]);
+  ok((await d.post(`/api/dispatch/rides/${started.id}/cancel`)).status === 409, "a ride that already started cannot be cancelled");
+}
+
+step("series warning in billing: completed date without the patient's confirmation");
+{
+  const d = new Client(); await d.login("dispatch.spree@demo.med");
+  const ph = await phone("driver.spree@demo.med");
+  const rides = (await ph.sync()).rides.filter((r) => r.prescriptionId === "rx_p20");
+  const first = rides.find((r) => r.status === "picked_up") ?? rides[0];
+  await ph.sync([await ph.sign(ph.ev(first, "dropoff"))]);
+  const b = await d.get("/api/dispatch/billing");
+  const item = b.items.find((i) => i.rideId === first.id);
+  ok(item && !item.eligible && item.flags.some((f) => f.code === "series_unconfirmed"), "billing names it as an unconfirmed SERIES date, not billable");
+}
+
+step("insurer is informed about approval-free trips");
+{
+  const a = await ins.get("/api/insurer/approvals");
+  ok(a.informed.length > 0 && a.informed.every((x) => !a.approvals.some((y) => y.id === x.id)), `${a.informed.length} approval-free trips listed, none of them in the approval queue`);
+  ok(a.informed.some((x) => x.company), "it shows which company took the trip");
+}
+
+step("PDF letter");
+{
+  const doc = new Client(); await doc.login("doctor@demo.med");
+  const res = await fetch(BASE + "/api/prescriptions/rx_p3/letter.pdf", { headers: { cookie: Object.entries(doc.jar).map(([k, v]) => `${k}=${v}`).join("; ") } });
+  const buf = Buffer.from(await res.arrayBuffer());
+  ok(res.status === 200 && res.headers.get("content-type") === "application/pdf" && buf.subarray(0, 5).toString() === "%PDF-" && buf.length > 5000, `a real PDF (${Math.round(buf.length / 1024)} KB) with the QR code embedded`);
+  ok((await fetch(BASE + "/api/prescriptions/rx_p3/letter.pdf")).status === 401, "anonymous cannot download it");
+  ok((await new Client().call("GET", "/api/prescriptions/rx_p3/letter.pdf")).status === 401, "no session -> 401");
+}
 console.log(failures ? `\n${failures} check(s) FAILED` : "\nAll case checks passed");
 process.exit(failures ? 1 : 0);

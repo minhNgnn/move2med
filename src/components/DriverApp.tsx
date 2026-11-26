@@ -4,7 +4,7 @@ import { Check, CheckCircle2, ChevronDown, CreditCard, KeyRound, Loader2, LogOut
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/hooks";
 import { useLang } from "@/lib/lang";
-import { anchoredNow, db, getKV, isSimOffline, lastSyncAt, loadRides, pendingCount, pendingRideIds, recordEvent, registerDevice, setKV, setSimOffline, sha256hex, syncNow, wipeAll } from "@/lib/driver/store";
+import { anchoredNow, getKV, oldestPendingAt, isSimOffline, lastSyncAt, loadRides, pendingCount, pendingRideIds, recordEvent, registerDevice, setKV, setSimOffline, sha256hex, syncNow, wipeAll } from "@/lib/driver/store";
 import type { DriverRide, Phase } from "@/lib/driver/types";
 import { LangToggle } from "./Shell";
 import { Badge, Button, ErrorBox, Field, Input, Logo } from "./ui";
@@ -34,6 +34,7 @@ export function DriverApp() {
   const [rides, setRides] = useState<DriverRide[]>([]);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [pending, setPending] = useState(0);
+  const [oldest, setOldest] = useState<number | null>(null);
   const [online, setOnline] = useState(true);
   const [sim, setSim] = useState(false);
   const [last, setLast] = useState<number | undefined>();
@@ -48,6 +49,7 @@ export function DriverApp() {
   const refresh = useCallback(async () => {
     setRides(await loadRides());
     setPending(await pendingCount());
+    setOldest(await oldestPendingAt());
     setPendingIds(await pendingRideIds());
     setLast(await lastSyncAt());
     setSim(await isSimOffline());
@@ -181,6 +183,11 @@ export function DriverApp() {
       {offline && (
         <div className="mx-4 mt-4 rounded-xl border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-warn">
           <b>{L("No signal? No problem.", "Kein Netz? Kein Problem.")}</b> {L("Everything you do is signed and saved encrypted on this phone, and syncs by itself when you are back online.", "Alles, was Sie tun, wird signiert und verschlüsselt auf diesem Handy gespeichert und automatisch synchronisiert, sobald Sie wieder online sind.")}
+        </div>
+      )}
+      {oldest && now - oldest > 4 * 3600_000 && (
+        <div className="mx-4 mt-4 rounded-xl border border-bad/30 bg-bad-soft px-4 py-3 text-sm text-bad">
+          <b>{L("Unsynced for more than 4 hours.", "Seit mehr als 4 Stunden nicht synchronisiert.")}</b> {L("Get a connection soon: proofs stay unverified until they sync, and after 24 hours the insurer reviews them by hand.", "Bitte bald verbinden: Nachweise bleiben unverifiziert, bis sie synchronisiert sind, und nach 24 Stunden prüft die Krankenkasse sie manuell.")}
         </div>
       )}
       {needLogin && <div className="mx-4 mt-4"><LoginInline onDone={() => { setNeedLogin(false); sync(); }} /></div>}

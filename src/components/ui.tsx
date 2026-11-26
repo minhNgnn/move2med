@@ -83,8 +83,8 @@ const TONES = {
   info: "bg-cyan-soft text-ink ring-cyan/30",
   ink: "bg-ink text-white ring-ink",
 };
-export function Badge({ tone = "neutral", children, className }: { tone?: keyof typeof TONES; children: ReactNode; className?: string }) {
-  return <span className={clsx("inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", TONES[tone], className)}>{children}</span>;
+export function Badge({ tone = "neutral", children, className, title }: { tone?: keyof typeof TONES; children: ReactNode; className?: string; title?: string }) {
+  return <span title={title} className={clsx("inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", TONES[tone], className)}>{children}</span>;
 }
 
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {

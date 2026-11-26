@@ -197,8 +197,9 @@ export async function driverRidesFor(userId: string) {
 // ---------- events and proofs ----------
 export type IncomingEvent = { id: string; rideId: string; type: string; payload: string; signature: string };
 
-const BLOCKING = new Set(["clock_mismatch", "gps_time_mismatch", "ride_changed", "device_revoked", "bad_signature", "pin_wrong", "wrong_challenge"]);
+const BLOCKING = new Set(["late_sync", "clock_mismatch", "gps_time_mismatch", "ride_changed", "device_revoked", "bad_signature", "pin_wrong", "wrong_challenge"]);
 const SKEW_MS = 5 * 60 * 1000;
+const LATE_SYNC_MS = 24 * 3600 * 1000;
 
 async function mintPoppToken(rx: Rx, patient: Patient, companyIk: string, tapTime: Date, method: string) {
   return signCompact("popp", {
@@ -283,6 +284,8 @@ export async function ingestEvents(device: typeof schema.devices.$inferSelect, e
     if (anchored && Math.abs(anchored.getTime() - deviceTime.getTime()) > SKEW_MS) flags.push("clock_mismatch");
     if (parsed.gps?.t && Math.abs(parsed.gps.t - (anchored ?? deviceTime).getTime()) > SKEW_MS) flags.push("gps_time_mismatch");
     if (!parsed.gps) flags.push("no_gps");
+    // Evidence that reaches us more than 24 h after it happened is not rejected, but a human looks at it.
+    if (Date.now() - (anchored ?? deviceTime).getTime() > LATE_SYNC_MS) flags.push("late_sync");
     if (ride.status === "cancelled" || (ride.driverId && ride.driverId !== device.userId)) flags.push("ride_changed");
 
     await db.insert(schema.rideEvents).values({
@@ -348,4 +351,19 @@ export async function proofChecks(rideId: string) {
     status: proof.status,
     flags: proof.flags,
   };
+}
+
+/**
+ * A status lifecycle aligned to FHIR Task (the same resource the eRezept workflow uses), derived from our own states,
+ * so a later move onto the TIFlow Fachdienst does not change what the interface says.
+ */
+export function workflowStatus(rx: Pick<Rx, "status" | "boundCompanyId">, rides: { status: string }[]) {
+  if (rx.status === "cancelled") return "cancelled";
+  if (rx.status === "rejected") return "rejected";
+  if (rx.status === "pending_approval") return "requested";
+  const live = rides.filter((r) => r.status !== "cancelled");
+  if (!rx.boundCompanyId) return "ready";
+  if (live.length && live.every((r) => r.status === "completed")) return "completed";
+  if (live.some((r) => r.status === "picked_up" || r.status === "completed")) return "in-progress";
+  return "accepted";
 }

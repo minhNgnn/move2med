@@ -19,7 +19,10 @@ export function Letter({ origin, code, pin, approval, patient, trip }: Props) {
     <div className="min-h-screen bg-paper py-6 print:bg-white print:py-0">
       <div className="no-print mx-auto mb-4 flex max-w-[800px] items-center justify-between px-4">
         <LangToggle />
-        <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> {L("Print", "Drucken")}</Button>
+        <div className="flex gap-2">
+          <a href={`${typeof window !== "undefined" ? window.location.pathname.replace("/letter/", "/api/prescriptions/") : ""}/letter.pdf`}><Button variant="secondary">PDF</Button></a>
+          <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> {L("Print", "Drucken")}</Button>
+        </div>
       </div>
       <article className="mx-auto max-w-[800px] bg-white p-10 shadow-sm print:shadow-none">
         <header className="flex items-start justify-between border-b border-line pb-5">

@@ -142,7 +142,7 @@ function TripCard({ res, code, dob, refresh, clear }: { res: Redeemed; code: str
       <div className="space-y-5">
         <Card
           title={<span className="flex items-center gap-2"><ClipboardList className="h-4 w-4 text-cyan" /> Trip Card</span>}
-          actions={preview ? <Badge tone="info">{L("Preview", "Vorschau")}</Badge> : <Badge tone="good">{L("Assigned to you", "Ihnen zugewiesen")}</Badge>}
+          actions={<span className="flex items-center gap-2">{(c as Card_ & { workflow?: string }).workflow && <Badge title="FHIR Task status">{(c as Card_ & { workflow?: string }).workflow}</Badge>}{preview ? <Badge tone="info">{L("Preview", "Vorschau")}</Badge> : <Badge tone="good">{L("Assigned to you", "Ihnen zugewiesen")}</Badge>}</span>}
         >
           {preview && (
             <p className="mb-4 rounded-xl bg-cyan-soft px-3.5 py-2.5 text-sm text-ink">
@@ -282,6 +282,41 @@ function AssignPanel({ res, c, refresh }: { res: Redeemed; c: Card_; refresh: ()
 }
 
 // ------------------------------------------------------------------ jobs
+const DOT: Record<string, string> = { planned: "bg-line", assigned: "bg-cyan", picked_up: "bg-warn", completed: "bg-good", cancelled: "bg-bad/30" };
+
+/** One row per series patient, one column per date: two dots (outbound, return) coloured by state. */
+function SeriesCalendar({ rides }: { rides: any[] }) {
+  const { L, lang } = useLang();
+  const series = rides.filter((r) => r.series);
+  if (!series.length) return null;
+  const dates = [...new Set(series.map((r) => r.scheduledDate))].sort();
+  const people = [...new Set(series.map((r) => r.prescriptionId))];
+  return (
+    <Card title={L("Series calendar", "Serienkalender")}>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead><tr><th className="pb-2 pr-4 text-left text-xs font-medium text-muted">{L("Patient", "Patient")}</th>{dates.map((d) => <th key={d} className="px-3 pb-2 text-center text-xs font-medium text-muted">{fmtDate(d, lang)}</th>)}</tr></thead>
+          <tbody>
+            {people.map((pid) => {
+              const mine = series.filter((r) => r.prescriptionId === pid);
+              return (
+                <tr key={pid} className="border-t border-line/60">
+                  <td className="py-2.5 pr-4"><span className="font-medium">{mine[0].patient}</span><span className="block text-xs text-muted">{mine[0].scenario}</span></td>
+                  {dates.map((d) => {
+                    const cell = mine.filter((r) => r.scheduledDate === d);
+                    return <td key={d} className="px-3 py-2.5 text-center">{cell.length ? <span className="inline-flex gap-1">{["hin", "rueck"].map((leg) => { const r = cell.find((x) => x.leg === leg); return <span key={leg} title={`${leg === "hin" ? L("outbound", "Hinfahrt") : L("return", "Rückfahrt")}: ${r?.status ?? "–"}`} className={clsx("inline-block h-3.5 w-3.5 rounded-full", r ? DOT[r.status] : "bg-transparent")} />; })}</span> : <span className="text-muted">–</span>}</td>;
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 flex flex-wrap gap-3 text-xs text-muted">{Object.entries(DOT).map(([k, c]) => <span key={k} className="inline-flex items-center gap-1.5"><span className={clsx("h-3 w-3 rounded-full", c)} />{k.replace("_", " ")}</span>)} · {L("left dot outbound, right dot return", "linker Punkt Hinfahrt, rechter Punkt Rückfahrt")}</p>
+    </Card>
+  );
+}
+
 function JobsTab({ rides, reload }: { rides: any[]; reload: () => void }) {
   const { L, lang } = useLang();
   const fleet = usePoll<{ vehicles: Vehicle[]; drivers: Driver[] }>("/api/dispatch/fleet", 8000);
@@ -293,6 +328,7 @@ function JobsTab({ rides, reload }: { rides: any[]; reload: () => void }) {
   return (
     <div className="space-y-5">
       {err && <ErrorBox>{err}</ErrorBox>}
+      <SeriesCalendar rides={rides} />
       {dates.map((d) => (
         <Card key={d} title={fmtDate(d, lang)}>
           <Table head={[L("Time", "Zeit"), L("Leg", "Fahrt"), L("Patient", "Patient"), L("Needs", "Bedarf"), L("Vehicle / driver", "Fahrzeug / Fahrer"), "Status", L("Proof", "Nachweis")]}>
@@ -315,7 +351,13 @@ function JobsTab({ rides, reload }: { rides: any[]; reload: () => void }) {
                     <span className="text-sm">{r.vehicleLabel ?? "–"}<span className="block text-xs text-muted">{r.driverName ?? ""}</span></span>
                   )}
                 </Td>
-                <Td><Badge tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</Badge></Td>
+                <Td>
+                  <Badge tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</Badge>
+                  {r.flags.filter((f: Flag) => f.code === "series_unconfirmed").map((f: Flag, i: number) => <span key={i} className="mt-1 block text-xs text-warn">⚠ {L("not confirmed", "nicht bestätigt")}</span>)}
+                  {["planned", "assigned"].includes(r.status) && (
+                    <button className="mt-1 block text-xs text-bad underline" onClick={async () => { if (confirm(L("Cancel this ride? The patient is told by SMS.", "Diese Fahrt stornieren? Der Patient wird per SMS informiert."))) { try { await api(`/api/dispatch/rides/${r.id}/cancel`, { body: {} }); reload(); } catch (e) { setErr((e as Error).message); } } }}>{L("Cancel this date", "Diesen Termin stornieren")}</button>
+                  )}
+                </Td>
                 <Td>{r.proof ? <Badge tone={r.proof.status === "verified" ? "good" : r.proof.status === "awaiting" ? "info" : "warn"}>{r.proof.status.replace("_", " ")}</Badge> : <span className="text-xs text-muted">–</span>}</Td>
               </tr>
             ))}

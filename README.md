@@ -45,8 +45,9 @@ Language: English by default, one click to German (top right).
 node scripts/smoke.mjs            # hero flow: issue → approve → redeem → accept → assign → sign → bill → verify
 node scripts/smoke-cases.mjs      # #13 co-payment, #10 proxy, #18 heavy-duty, key revoke/reassign, suspend
 node scripts/e2e-driver.mjs       # real Chromium: offline ride, reload offline, encrypted storage, sync, remote wipe
+node scripts/e2e-driver-claims.mjs <dir>  # real Chromium: tampered phone clock is caught, stale unsynced evidence warns
 ```
-The first two need a running server; the last needs a **production** server (`pnpm build && pnpm start -p 3100`) and
+The first two need a running server (they log in a lot: wait a minute between runs, the rate limiter is on); the last needs a **production** server (`pnpm build && pnpm start -p 3100`) and
 `pnpm add -D playwright && pnpm exec playwright install chromium`.
 
 ## How it is built

@@ -12,7 +12,7 @@ type Tab = "approvals" | "companies" | "audit" | "billing" | "review";
 export function InsurerApp() {
   const { L } = useLang();
   const [tab, setTab] = useState<Tab>("approvals");
-  const ap = usePoll<{ approvals: any[] }>("/api/insurer/approvals", 3000);
+  const ap = usePoll<{ approvals: any[]; informed: any[] }>("/api/insurer/approvals", 3000);
   const rv = usePoll<{ items: any[] }>("/api/insurer/review", 3000);
   const pending = ap.data?.approvals.filter((a) => a.status === "pending").length ?? 0;
   return (
@@ -28,7 +28,7 @@ export function InsurerApp() {
           { id: "review", label: L("Review queue", "Prüfliste"), badge: rv.data?.items.length || null },
         ]}
       />
-      {tab === "approvals" && <Approvals items={ap.data?.approvals ?? []} reload={ap.reload} />}
+      {tab === "approvals" && <Approvals items={ap.data?.approvals ?? []} informed={ap.data?.informed ?? []} reload={ap.reload} />}
       {tab === "companies" && <Companies />}
       {tab === "audit" && <Audit />}
       {tab === "billing" && <Billing />}
@@ -37,7 +37,7 @@ export function InsurerApp() {
   );
 }
 
-function Approvals({ items, reload }: { items: any[]; reload: () => void }) {
+function Approvals({ items, informed, reload }: { items: any[]; informed: any[]; reload: () => void }) {
   const { L } = useLang();
   const [note, setNote] = useState<Record<string, string>>({});
   const pending = items.filter((i) => i.status === "pending");
@@ -74,6 +74,20 @@ function Approvals({ items, reload }: { items: any[]; reload: () => void }) {
             </div>
           ))}
         </div>
+      </Card>
+      <Card title={L(`Informed: trips that need no approval (${informed.length})`, `Zur Kenntnis: Fahrten ohne Genehmigungspflicht (${informed.length})`)}>
+        <p className="mb-3 text-sm text-muted">{L("Approval-free trips (e.g. hospital admission) go straight to the patient. You are informed so you can see who is transported and by whom.", "Genehmigungsfreie Fahrten (z. B. Krankenhausaufnahme) gehen direkt an den Patienten. Sie werden informiert und sehen, wer von wem befördert wird.")}</p>
+        {!informed.length ? <Empty>{L("None yet.", "Noch keine.")}</Empty> : (
+          <Table head={[L("Patient", "Patient"), L("Scenario", "Szenario"), L("Vehicle", "Fahrzeug"), L("Company", "Unternehmen"), L("Key", "Schlüssel")]}>
+            {informed.map((a) => (
+              <tr key={a.id}>
+                <Td>{a.patient}</Td><Td>{a.scenario}</Td><Td className="text-xs">{a.hin.befoerderungsart}{a.hin.ausstattung !== "keine" ? ` · ${a.hin.ausstattung}` : ""}</Td>
+                <Td>{a.company ?? <span className="text-muted">{L("not chosen yet", "noch nicht gewählt")}</span>}</Td>
+                <Td>{a.keyStatus === "revoked" ? <Badge tone="bad">{L("revoked", "widerrufen")}</Badge> : <Badge tone="good">{L("active", "aktiv")}</Badge>}</Td>
+              </tr>
+            ))}
+          </Table>
+        )}
       </Card>
       {done.length > 0 && (
         <Card title={L("Decided", "Entschieden")}>
@@ -226,6 +240,7 @@ const FLAG_TEXT: Record<string, [string, string]> = {
   bad_signature: ["Device signature does not match the data", "Gerätesignatur passt nicht zu den Daten"],
   pin_wrong: ["Wrong PIN", "Falsche PIN"],
   wrong_challenge: ["Tap was not made for this ride", "Tipp gehörte nicht zu dieser Fahrt"],
+  late_sync: ["Evidence reached the server more than 24 hours after it happened", "Nachweis erreichte den Server mehr als 24 Stunden nach dem Ereignis"],
   no_gps: ["No GPS position captured", "Keine GPS-Position erfasst"],
 };
 

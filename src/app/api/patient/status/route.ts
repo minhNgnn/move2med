@@ -2,7 +2,7 @@ import { desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { handle, requirePatient } from "@/lib/api";
 import { loadForPatient } from "@/lib/patient";
-import { approvalStatus } from "@/lib/domain";
+import { approvalStatus, workflowStatus } from "@/lib/domain";
 
 export const GET = handle(async () => {
   const ps = await requirePatient();
@@ -16,6 +16,7 @@ export const GET = handle(async () => {
   return {
     patient: { name: p.name, insurer: p.insurerName },
     status: rx.status,
+    workflow: workflowStatus(rx, rides),
     approval: approvalStatus(rx),
     keyStatus: rx.keyStatus,
     company: company ? { name: company.name } : null,

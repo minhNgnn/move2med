@@ -51,3 +51,14 @@ Voice assistant (decided later), real SMS, real TI/PoPP connection or card readi
 
 `docs/source/`, `docs/images/challenge_slides/` and the Impulspapier diagram are not committed (copyright / photos of people).
 The mock JSON data may be public (approved by the organisers).
+
+## Status (end of build day)
+
+Built, deployed (Vercel + Neon) and tested: every screen and rule above, plus the series calendar with per-date cancellation,
+stale-evidence handling (phone warning after 4 h, server review after 24 h), the insurer's "informed" list for approval-free trips,
+a FHIR-Task-aligned status, company registration, fleet and driver management, live QR scanning, a bilingual PDF letter and bilingual SMS.
+
+Deliberately not built: several companies sharing a series (slide only), a real FHIR / TIFlow model, the voice assistant (parked).
+Unverified without a real device: Android NFC tap detection and Background Sync, live camera on a phone, printing.
+
+Tests: `scripts/smoke.mjs`, `scripts/smoke-cases.mjs` (API), `scripts/e2e-driver.mjs`, `scripts/e2e-driver-claims.mjs` (real Chromium).

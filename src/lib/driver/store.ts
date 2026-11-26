@@ -77,6 +77,8 @@ async function putRide(ride: DriverRide) {
 }
 
 export const pendingCount = () => db.events.count();
+/** When the oldest unsent event was created (ms), or null. Used to warn when evidence waits too long for a connection. */
+export const oldestPendingAt = async () => (await db.events.orderBy("createdAt").first())?.createdAt ?? null;
 export const pendingRideIds = async () => new Set((await db.events.toArray()).map((e) => e.rideId));
 
 // ---------------------------------------------------------------- trusted time

@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { Addr } from "@/db/schema";
 import { sendSms } from "./api";
@@ -217,7 +217,7 @@ export async function gatewayCountersign(payload: string, deviceSig: string, tok
 export async function evaluateProof(rideId: string) {
   const [ride] = await db.select().from(schema.rides).where(eq(schema.rides.id, rideId));
   if (!ride) return;
-  const [ev] = await db.select().from(schema.rideEvents).where(and(eq(schema.rideEvents.rideId, rideId), eq(schema.rideEvents.type, "tap"))).limit(1);
+  const [ev] = await db.select().from(schema.rideEvents).where(and(eq(schema.rideEvents.rideId, rideId), eq(schema.rideEvents.type, "tap"))).orderBy(desc(schema.rideEvents.receivedAt)).limit(1);
   if (!ev) return;
   const [rx] = await db.select().from(schema.prescriptions).where(eq(schema.prescriptions.id, ride.prescriptionId));
   const [patient] = await db.select().from(schema.patients).where(eq(schema.patients.id, rx.patientId));
